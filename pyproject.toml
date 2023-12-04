@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "libro"
+version = "0.1.0"
+description = ""
+authors = ["zhanba <c5e1856@gmail.com>", "brokun <brokun0128@gmail.com>"]
+readme = "README.md"
+packages = [{include = "libro_server"}]
+include = ['README.md', 'setup.py', 'jupyter-config', 'libro_server/static/**/*', 'libro_server/template', 'libro_server/*.py']
+
+[tool.poetry.scripts]
+libro = 'libro_server.app:launch_new_instance'
+
+
+[tool.poe.tasks]
+dev = "libro --config=./dev-config/jupyter_server_config.py --debug"
+lab = "jupyter lab --config=./dev-config/jupyter_server_config.py --debug"
+publish = "twine upload dist/*"
+gateway = 'jupyter lab --config=./dev-config/jupyter_server_config.py --debug --gateway-url=http://127.0.0.1:8888'
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+jupyter-server = "^2.7.0"
+ipykernel = "^6.24.0"
+ipython = "8.12.2"
+
+
+[tool.poetry.group.dev.dependencies]
+jupyter-lsp = "^2.2.0"
+pandas = "^1.5.1"
+transformers = "^4.31.0"
+matplotlib = "^3.7.2"
+pandas-stubs = "^1.5.3"
+poethepoet = "^0.21.1"
+twine = "^4.0.2"
+jupyterlab = "^3.6.5"
+python-lsp-server = "^1.8.2"
+ruff = "0.0.291"
+yapf = "^0.40.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
