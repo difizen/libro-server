@@ -20,7 +20,7 @@ poetry install
 
 ## dev
 
-启动开发服务器，配合 libro 前端的 demo 调试和 libro-app 开发
+启动开发服务器
 
 ```sh
 # open libro server in dev mode
