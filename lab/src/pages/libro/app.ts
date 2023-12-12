@@ -13,10 +13,7 @@ export class LibroApp implements ApplicationContribution {
   @inject(ConfigurationService) configurationService: ConfigurationService;
 
   async onStart() {
-    this.serverConnection.updateSettings({
-      baseUrl: 'http://localhost:8888/',
-      wsUrl: 'ws://localhost:8888/',
-    });
+    this.serverConnection.updateSettings({});
     this.serverManager.launch();
   }
 }

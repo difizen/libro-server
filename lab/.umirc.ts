@@ -1,9 +1,9 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  base: '/libro',
-  publicPath: '',
-  routes: [{ path: '/', component: 'libro' }],
+  publicPath: '/',
+  routes: [{ path: '/*', component: 'libro' }],
+  runtimePublicPath: {},
   proxy: {
     '/api': {
       target: 'http://localhost:8888/',
@@ -15,10 +15,8 @@ export default defineConfig({
     },
     '/lsp': {
       target: 'http://localhost:8888/',
-
       changeOrigin: true,
       secure: false,
-
       ws: true,
     },
   },
@@ -32,4 +30,5 @@ export default defineConfig({
   ],
   plugins: ['./dumi-plugin-nodenext'],
   mfsu: false,
+  jsMinifier: 'none',
 });

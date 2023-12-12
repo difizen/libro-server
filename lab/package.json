@@ -20,8 +20,8 @@
     "deploy": "copyfiles -u 1 dist/* ../libro_server/static/ && copyfiles -u 1 dist/**/* ../libro_server/static/"
   },
   "dependencies": {
-    "@difizen/libro-lab": "^0.1.0",
-    "@difizen/libro-jupyter": "^0.1.0",
+    "@difizen/libro-lab": "^0.1.1",
+    "@difizen/libro-jupyter": "^0.1.1",
     "@difizen/mana-app": "^0.1.0",
     "@ant-design/icons": "^5.1.4",
     "antd": "^5.7.2",
