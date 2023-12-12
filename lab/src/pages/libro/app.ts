@@ -1,4 +1,4 @@
-import { ServerConnection, ServerManager } from '@difizen/libro-jupyter';
+import { PageConfig, ServerConnection, ServerManager } from '@difizen/libro-jupyter';
 import { ConfigurationService } from '@difizen/mana-app';
 import { SlotViewManager } from '@difizen/mana-app';
 import { ApplicationContribution, ViewManager } from '@difizen/mana-app';
@@ -13,7 +13,19 @@ export class LibroApp implements ApplicationContribution {
   @inject(ConfigurationService) configurationService: ConfigurationService;
 
   async onStart() {
-    this.serverConnection.updateSettings({});
+    let baseUrl = PageConfig.getOption('baseUrl');
+    const el = document.getElementById('jupyter-config-data');
+    if (el) {
+      const pageConfig = JSON.parse(el.textContent || '') as Record<string, string>;
+      baseUrl = pageConfig['baseUrl'];
+      if (baseUrl && baseUrl.startsWith('/')) {
+        baseUrl = window.location.origin + baseUrl;
+      }
+    }
+    this.serverConnection.updateSettings({
+      baseUrl,
+      wsUrl: baseUrl.replace(/^http(s)?/, 'ws$1'),
+    });
     this.serverManager.launch();
   }
 }
