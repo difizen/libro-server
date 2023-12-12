@@ -13,7 +13,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 进入 python 虚拟环境，安装依赖包
 
 ```sh
-cd ./python-packages/libro-server
+cd libro_server
 poetry shell
 poetry install
 ```

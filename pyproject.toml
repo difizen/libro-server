@@ -6,6 +6,7 @@ authors = ["zhanba <c5e1856@gmail.com>", "brokun <brokun0128@gmail.com>"]
 readme = "README.md"
 packages = [{include = "libro_server"}]
 include = ['README.md', 'setup.py', 'jupyter-config', 'libro_server/static/**/*', 'libro_server/template', 'libro_server/*.py']
+exclude = ['lab/**/*']
 
 [tool.poetry.scripts]
 libro = 'libro_server.app:launch_new_instance'
@@ -18,10 +19,11 @@ publish = "twine upload dist/*"
 gateway = 'jupyter lab --config=./dev-config/jupyter_server_config.py --debug --gateway-url=http://127.0.0.1:8888'
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.12"
-jupyter-server = "^2.7.0"
-ipykernel = "^6.24.0"
-ipython = "8.12.2"
+python = ">=3.7,<3.12"
+jupyter-server = "^1.24.0"
+jupyterlab-server = "^2.24.0"
+ipykernel = "^6.16.2"
+ipython = "^7.34.0"
 
 
 [tool.poetry.group.dev.dependencies]

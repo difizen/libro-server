@@ -1,18 +1,27 @@
 import os
+from glob import glob
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
-from libro_server.handler import ErrorHandler, TemplateHandler
+from traitlets import Unicode
+from jupyterlab_server import LabConfig, add_handlers
+from jupyter_server.utils import url_path_join as ujoin
+from os.path import relpath
+
+from libro_server.handler import LibroLabHandler
 
 DEFAULT_STATIC_FILES_PATH = os.path.join(os.path.dirname(__file__), "static")
-DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "template")
+DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "templates")
 
-class LibroApp(ExtensionAppJinjaMixin, ExtensionApp):
+class LibroApp(ExtensionAppJinjaMixin, LabConfig, ExtensionApp):
 
     # -------------- Required traits --------------
     name = "libro"
-    default_url = "/libro"
+    default_url = Unicode("/libro", help="The default URL to redirect to from `/`")
+    extension_url = "/libro"
     load_other_extensions = True
     file_url_prefix = "/libro-render"
 
+    # Should your extension expose other server extensions when launched directly?
+    load_other_extensions = True
     # Local path to static files directory.
     static_paths = [DEFAULT_STATIC_FILES_PATH]
 
@@ -21,21 +30,37 @@ class LibroApp(ExtensionAppJinjaMixin, ExtensionApp):
 
     # ----------- add custom traits below ---------
 
-    def initialize_settings(self):
-        """Initialize settings."""
-        # Update the self.settings trait to pass extra
-        # settings to the underlying Tornado Web Application.
-        self.log.info(f"Config {self.config}")
+    def initialize_settings(self) -> None:
+        """Initialize the settings:
 
-    def initialize_handlers(self):
-        """Initialize handlers."""
-        self.log.info(f"init handles")
-        self.handlers.extend(
-            [
-                (rf"/{self.name}/?", TemplateHandler),
-                (rf"/{self.name}/(.*)", ErrorHandler),
+        set the static files as immutable, since they should have all hashed name.
+        """
+        immutable_cache = set(self.settings.get("static_immutable_cache", []))
+
+        # Set lab static files as immutables
+        immutable_cache.add(self.static_url_prefix)
+
+        # Set extensions static files as immutables
+        for extension_path in self.labextensions_path + self.extra_labextensions_path:
+            extensions_url = [
+                ujoin(self.labextensions_url, relpath(path, extension_path))
+                for path in glob(f"{extension_path}/**/static", recursive=True)
             ]
-        )
+
+            immutable_cache.update(extensions_url)
+
+        self.settings.update({"static_immutable_cache": list(immutable_cache)})
+    def initialize_templates(self) -> None:
+        """Initialize templates."""
+        # self.static_paths = [self.static_dir]
+        # self.template_paths = [os.path.join(os.path.dirname(__file__), "templates")]
+
+    def initialize_handlers(self) -> None:
+        """Initialize handlers."""
+        # LIBRO_URL_PATTERN = (r"/(?P<libro>/libro/.*)?")
+        # url_pattern = LIBRO_URL_PATTERN.format(self.app_url.replace("/", ""))
+        self.handlers.append((rf"/{self.name}/?", LibroLabHandler))
+        add_handlers(self.handlers, self)
 
 # -----------------------------------------------------------------------------
 # Main entry point
