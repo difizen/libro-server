@@ -1,5 +1,8 @@
+from ._version import __version__
+
 from .app import LibroApp
 
+from .magics import load_ipython_extension, unload_ipython_extension
 
 def _jupyter_server_extension_points():
     """
