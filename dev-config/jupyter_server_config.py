@@ -339,7 +339,9 @@ c.ServerApp.disable_check_xsrf = True
 #  be used to enable and disable the loading ofthe extensions. The extensions
 #  will be loaded in alphabetical order.
 #  Default: {}
-# c.ServerApp.jpserver_extensions = {}
+# c.ServerApp.jpserver_extensions = {
+#     "jupyter_lsp": True,
+# }
 
 # The kernel manager class to use.
 #  Default: 'jupyter_server.services.kernels.kernelmanager.MappingKernelManager'
@@ -471,7 +473,7 @@ c.ServerApp.disable_check_xsrf = True
 
 # The directory to use for notebooks and kernels.
 #  Default: ''
-# c.ServerApp.root_dir = ""
+c.ServerApp.root_dir = "examples"
 
 # The session manager class to use.
 #  Default: 'builtins.object'
@@ -1748,20 +1750,16 @@ c.ServerApp.token = ""
 # c.ZMQChannelsWebsocketConnection.session = None
 
 
-import shutil
-
 # c is a magic, lazy variable
 c.LanguageServerManager.language_servers = {
-    "pyright-extended": {
+    "ruff-lsp": {
         # if installed as a binary
         "argv": [
-            "node",
-            "node_modules/@replit/pyright-extended/langserver.index.js",
-            "--stdio",
+            "ruff-lsp",
         ],
         "languages": ["python"],
         "version": 2,
         "mime_types": ["text/x-python"],
-        "display_name": "pyright-extended",
+        "display_name": "ruff-lsp",
     },
 }
