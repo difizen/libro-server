@@ -3,7 +3,7 @@
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
-from ..model import model_registry
+from ..chat import chat_provider
 
 logger = log()
 
@@ -57,7 +57,7 @@ class MimeTypeForPrompt(object):
 class PromptMagic(Magics):
     """
     %%prompt 
-    {"model_name":"MyGPT","prompt":"do something"}
+    {"chat_key":"MyGPT","prompt":"do something"}
     """
 
     LLM_generate_res = ''
@@ -78,10 +78,14 @@ class PromptMagic(Magics):
             ) = preprocessing_cell_prompt(cell, local_ns)
 
 
-        model_name = args["model_name"]
-        if(model_registry.promptModelRegistry.has_model(model_name)):
-            model = model_registry.promptModelRegistry.get_model(model_name)
-            res = model.run(args["prompt"])
-            return MimeTypeForPrompt(val={"data": res})
+        chat_key = args["chat"]
+        dict = chat_provider.to_dict()
+        if chat_key in dict:
+            exist = dict.get(chat_key)
+            if exist:
+                executor = exist.to_executor()
+                if executor:
+                    res = executor.run(args["prompt"])
+                    return MimeTypeForPrompt(val={"data": res})
         else:
-            raise Exception("model %s not registered!" % model_name)
+            raise Exception("Chat executor for %s not found!" % chat_key)
