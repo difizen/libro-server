@@ -28,6 +28,7 @@ jupyter-lsp = "^2.2.0"
 python-lsp-server = "^1.8.2"
 ruff = "^0.0.291"
 ruff-lsp = "^0.0.49"
+langchain = "^0.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

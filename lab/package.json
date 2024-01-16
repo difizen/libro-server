@@ -22,11 +22,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
-    "@difizen/libro-jupyter": "^0.1.2",
-    "@difizen/libro-lab": "^0.1.2",
+    "@difizen/libro-jupyter": "^0.1.6",
+    "@difizen/libro-lab": "^0.1.6",
     "@difizen/mana-app": "^0.1.3",
-    "antd": "^5.12.4",
-    "umi": "^4.0.89"
+    "antd": "^5.12.5",
+    "umi": "^4.0.90"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.23.6",

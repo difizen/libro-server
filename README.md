@@ -25,8 +25,6 @@ poetry install
 ```sh
 # open libro server in dev mode
 poe dev
-# open jupyter lab in dev mode
-poe lab
 ```
 
 Libro Server 默认使用基于 [libro-lab](https://github.com/difizen/libro/tree/main/packages/libro-lab) 的前端应用，作为前端静态资源
