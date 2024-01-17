@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 from pydantic import Field
 
 from .source import WHERE_CHAT_ITEM_FROM
@@ -11,6 +11,12 @@ MODEL_NAME_ALIASES = {
     "text-davinci-003": "gpt3",
     "gpt-3.5-turbo":"chatgpt",
     "gpt-4": "gpt4",
+}
+
+ALIASE_NAME_MODEL = {
+    "gpt3":"text-davinci-003",
+    "chatgpt": "gpt-3.5-turbo",
+    "gpt4": "gpt-4",
 }
 
 class OpenAIChat(LLMChat):
@@ -35,14 +41,17 @@ class OpenAIChat(LLMChat):
 
 class OpenAIChatItemProvider(ChatItemProvider):
     name: str = "openai"
-    executors: List[ChatExecutor] = None
+    cache: Dict[str, ChatExecutor] = {}
     models: List[str] = ["gpt-3.5-turbo","gpt-4"]
+
+    def get_or_create_executor(self, name: str) -> ChatExecutor:
+        if name in self.cache:
+            return self.cache[name]
+        model = ALIASE_NAME_MODEL.get(name, name)
+        executor = OpenAIChat(model=model, name=name)
+        if executor.load():
+            self.cache[model] = executor
+        return executor
+
     def list(self) -> List[ChatItem]:
-        if self.executors is None:
-            self.executors = []
-            for model in self.models:
-                alias = MODEL_NAME_ALIASES.get(model, model)
-                executor = OpenAIChat(model=model, name=alias)
-                if executor.load():
-                    self.executors.append(executor)
-        return map(lambda x: ChatItem(name=x.name, order=x.order, to_executor=lambda: x, type=WHERE_CHAT_ITEM_FROM.LLM), self.executors)
+        return map(lambda n: ChatItem(name=MODEL_NAME_ALIASES.get(n, n), to_executor=self.get_or_create_executor, type=WHERE_CHAT_ITEM_FROM.LLM), self.models)

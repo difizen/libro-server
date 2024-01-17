@@ -39,7 +39,7 @@ class ChatProvider(BaseModel):
         list = sorted(self.get_provider_dict().values(), key=lambda x: x.order)
         return list
     
-    def to_json(self) -> str:
+    def dump_list_json(self) -> str:
         """List chat items."""
         list = self.get_provider_list()
         return json.dumps([item.model_dump() for item in list])

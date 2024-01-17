@@ -35,16 +35,13 @@ class LangChainVariableChatItemProvider(ChatItemProvider):
     name: str = "langchain_variable"
     cache: Dict[str, ChatExecutor] = {}
 
-    def get_or_create_executor(self, variable: dict) -> ChatExecutor:
-        if variable["name"] in self.cache:
-            return self.cache[variable["name"]]
-        executor = LangChainVariableChat(variable=variable)
-        self.cache[variable["name"]] = executor
+    def get_or_create_executor(self, v: dict) -> ChatExecutor:
+        if v["name"] in self.cache:
+            return self.cache[v["name"]]
+        executor = LangChainVariableChat(variable=v)
+        self.cache[v["name"]] = executor
         return executor
 
     def list(self) -> List[ChatItem]:
-        executors = []
-        for variable in get_langchain_variable_dict_list():
-            executor = self.get_or_create_executor(variable=variable)
-            executors.append(executor)
-        return map(lambda x: ChatItem(name=x.name, order=x.order, to_executor=self.get_or_create_executor, type=WHERE_CHAT_ITEM_FROM.VARIABLE), executors)
+        variables = get_langchain_variable_dict_list()
+        return map(lambda v: ChatItem(name=v["name"], to_executor=self.get_or_create_executor, type=WHERE_CHAT_ITEM_FROM.VARIABLE), variables)
