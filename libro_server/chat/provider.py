@@ -26,7 +26,7 @@ class ChatProvider(BaseModel):
         chat_items: Dict[str, ChatItem] = {}
         for provider in self.providers:
             for item in provider.list():
-                key = item.to_key()
+                key = item.key
                 exists = chat_items.get(key)
                 if exists:
                     if exists.order > item.order:

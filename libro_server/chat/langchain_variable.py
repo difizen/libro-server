@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from .source import WHERE_CHAT_ITEM_FROM
+from .source import CHAT_SOURCE
 from .item import ChatItem, ChatItemProvider
 from .executor import ChatExecutor
 from ..utils.langchain import get_langchain_variable_dict_list
@@ -44,4 +44,4 @@ class LangChainVariableChatItemProvider(ChatItemProvider):
 
     def list(self) -> List[ChatItem]:
         variables = get_langchain_variable_dict_list()
-        return map(lambda v: ChatItem(name=v["name"], to_executor=self.get_or_create_executor, type=WHERE_CHAT_ITEM_FROM.VARIABLE), variables)
+        return map(lambda v: ChatItem(name=v["name"], to_executor=lambda:self.get_or_create_executor(v), type=CHAT_SOURCE["VARIABLE"]), variables)

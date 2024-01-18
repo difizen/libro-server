@@ -1,7 +1,7 @@
 from typing import Dict, List
 from pydantic import Field
 
-from .source import WHERE_CHAT_ITEM_FROM
+from .source import CHAT_SOURCE
 
 from .executor import LLMChat,ChatExecutor
 from .item import ChatItem, ChatItemProvider
@@ -31,10 +31,10 @@ class OpenAIChat(LLMChat):
             return True
         return False
     def run(self,value,**kwargs):
-        if not hasattr(self,"llm"):
+        if not self.chat:
             self.load()
         try:
-            result = self.chat(value,**kwargs)
+            result = self.chat.invoke(value,**kwargs)
             return result
         except Exception as e:
             return ""
@@ -45,13 +45,13 @@ class OpenAIChatItemProvider(ChatItemProvider):
     models: List[str] = ["gpt-3.5-turbo","gpt-4"]
 
     def get_or_create_executor(self, name: str) -> ChatExecutor:
-        if name in self.cache:
-            return self.cache[name]
         model = ALIASE_NAME_MODEL.get(name, name)
+        if model in self.cache:
+            return self.cache[model]
         executor = OpenAIChat(model=model, name=name)
         if executor.load():
             self.cache[model] = executor
         return executor
 
     def list(self) -> List[ChatItem]:
-        return map(lambda n: ChatItem(name=MODEL_NAME_ALIASES.get(n, n), to_executor=self.get_or_create_executor, type=WHERE_CHAT_ITEM_FROM.LLM), self.models)
+        return map(lambda n: ChatItem(name=MODEL_NAME_ALIASES.get(n, n), to_executor=lambda:self.get_or_create_executor(n), type=CHAT_SOURCE["LLM"]), self.models)
