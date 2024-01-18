@@ -78,14 +78,16 @@ class PromptMagic(Magics):
             ) = preprocessing_cell_prompt(cell, local_ns)
 
 
-        chat_key = args["chat"]
-        dict = chat_provider.to_dict()
+        chat_key = args["model_name"]
+        dict = chat_provider.get_provider_dict()
+        from IPython.display import display
         if chat_key in dict:
             exist = dict.get(chat_key)
             if exist:
+                display('chat key:'+chat_key)
                 executor = exist.to_executor()
-                if executor:
-                    res = executor.run(args["prompt"])
-                    return MimeTypeForPrompt(val={"data": res})
+                display(executor)
+                res = executor.run(args["prompt"])
+                return MimeTypeForPrompt(val={"data": res})
         else:
             raise Exception("Chat executor for %s not found!" % chat_key)
