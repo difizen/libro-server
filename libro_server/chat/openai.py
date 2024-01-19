@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 from pydantic import Field
 
 from .source import CHAT_SOURCE
@@ -19,26 +19,6 @@ ALIASE_NAME_MODEL = {
     "gpt4": "gpt-4",
 }
 
-class OpenAIChat(LLMChat):
-    name: str = "chatgpt"
-    model: str = Field(default="gpt-3.5-turbo")
-    chat: dict = None
-
-    def load(self):
-        if is_langchain_installed():
-            from langchain_community.chat_models import ChatOpenAI
-            self.chat = ChatOpenAI(model_name=self.model)
-            return True
-        return False
-    def run(self,value,**kwargs):
-        if not self.chat:
-            self.load()
-        try:
-            result = self.chat.invoke(value,**kwargs)
-            return result
-        except Exception as e:
-            return ""
-
 class OpenAIChatItemProvider(ChatItemProvider):
     name: str = "openai"
     cache: Dict[str, ChatExecutor] = {}
@@ -48,10 +28,13 @@ class OpenAIChatItemProvider(ChatItemProvider):
         model = ALIASE_NAME_MODEL.get(name, name)
         if model in self.cache:
             return self.cache[model]
+        from .openai_chat_executor import OpenAIChat
         executor = OpenAIChat(model=model, name=name)
         if executor.load():
             self.cache[model] = executor
         return executor
 
     def list(self) -> List[ChatItem]:
+        if not is_langchain_installed():
+            return []
         return map(lambda n: ChatItem(name=MODEL_NAME_ALIASES.get(n, n), to_executor=lambda:self.get_or_create_executor(n), type=CHAT_SOURCE["LLM"]), self.models)

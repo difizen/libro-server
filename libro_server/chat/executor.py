@@ -27,6 +27,12 @@ class LLMChat(ChatExecutor):
         self,value,**kwargs,
     ) -> str:
         """Chat and get result."""
+    
+    @abstractmethod
+    def display(
+        self,value,**kwargs,
+    ) -> str:
+        """Display result."""
 
 class APIChat(ChatExecutor):
     name: str = "api"

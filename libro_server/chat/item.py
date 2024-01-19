@@ -1,6 +1,7 @@
 from typing import List
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
+from typing import Callable
 
 from .source import CHAT_SOURCE
 from .executor import ChatExecutor
@@ -9,11 +10,7 @@ class ChatItem(BaseModel):
     name: str = None
     type: str = CHAT_SOURCE["CUSTOM"]
     order: int = 0
-    to_executor: lambda: ChatExecutor = None
-
-    def __init__(self, name: str, type: str = CHAT_SOURCE["CUSTOM"], order: int = 0, to_executor=None):
-        super().__init__(name=name, type=type, order=order)
-        self.to_executor = to_executor
+    to_executor: Callable[[], ChatExecutor] = None
 
     @property
     def key(self):
