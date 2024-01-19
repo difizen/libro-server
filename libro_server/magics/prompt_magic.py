@@ -80,14 +80,12 @@ class PromptMagic(Magics):
 
         chat_key = args["model_name"]
         dict = chat_provider.get_provider_dict()
-        from IPython.display import display
         if chat_key in dict:
             exist = dict.get(chat_key)
             if exist:
-                display('chat key:'+chat_key)
                 executor = exist.to_executor()
-                display(executor)
                 res = executor.run(args["prompt"])
-                return MimeTypeForPrompt(val={"data": res})
+                display_res = executor.display(res)
+                return MimeTypeForPrompt(val={"data": display_res})
         else:
             raise Exception("Chat executor for %s not found!" % chat_key)

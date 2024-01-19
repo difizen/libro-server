@@ -16,7 +16,7 @@ class ChatProvider(BaseModel):
             print(f"Provider {provider.name} already exists")
             return
         if isinstance(provider, ChatItemProvider) == False:
-            raise TypeError('Provider is not a instance of class ChatExecutorProvider')
+            raise TypeError('provider must be ChatItemProvider')
         if provider.name in map(lambda x: x.name, self.providers):
             print(f"Provider {provider.name} already exists")
             return
