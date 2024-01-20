@@ -26,7 +26,7 @@ class LangChainVariableChat(ChatExecutor):
             return self.runChat(v,value,**kwargs)
         else:
             return None
-    def display(self,value,**kwargs):
+    def result_to_str(self,value,**kwargs):
         if isinstance(value, str):
             return value
         if isinstance(value, AIMessage):

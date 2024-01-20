@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ast import arg
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
@@ -78,14 +79,23 @@ class PromptMagic(Magics):
             ) = preprocessing_cell_prompt(cell, local_ns)
 
 
-        chat_key = args["model_name"]
+        chat_key:str = args["model_name"]
+        prompt:str = args["prompt"]
         dict = chat_provider.get_provider_dict()
         if chat_key in dict:
             exist = dict.get(chat_key)
             if exist:
                 executor = exist.to_executor()
-                res = executor.run(args["prompt"])
-                display_res = executor.display(res)
+                res = executor.run(prompt)
+                display_res = executor.result_to_str(res)
+                try:
+                    if "variable_name" in args:
+                        variable_name:str = args["variable_name"]
+                        if variable_name and variable_name != "" and not variable_name.isidentifier():
+                            raise Exception('Invalid variable name "{}".'.format(variable_name))
+                        local_ns[variable_name] = res
+                except Exception as e:
+                    raise Exception("set variable error", e)
                 return MimeTypeForPrompt(val={"data": display_res})
         else:
             raise Exception("Chat executor for %s not found!" % chat_key)

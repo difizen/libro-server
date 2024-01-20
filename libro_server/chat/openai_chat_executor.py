@@ -37,7 +37,7 @@ class OpenAIChat(LLMChat):
             # return result
         except Exception as e:
             return ""
-    def display(self,value,**kwargs):
+    def result_to_str(self,value,**kwargs):
         if isinstance(value, str):
             return value
         if isinstance(value, AIMessage):

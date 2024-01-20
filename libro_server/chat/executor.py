@@ -12,6 +12,12 @@ class ChatExecutor(BaseModel, ABC):
         self,value,**kwargs,
     ) -> str:
         """Chat and get result."""
+    
+    @abstractmethod
+    def result_to_str(
+        self,value,**kwargs,
+    ) -> str:
+        """Display result."""
 
 class LLMChat(ChatExecutor):
     name: str = "custom"
@@ -27,12 +33,6 @@ class LLMChat(ChatExecutor):
         self,value,**kwargs,
     ) -> str:
         """Chat and get result."""
-    
-    @abstractmethod
-    def display(
-        self,value,**kwargs,
-    ) -> str:
-        """Display result."""
 
 class APIChat(ChatExecutor):
     name: str = "api"
