@@ -5,6 +5,7 @@ from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
 from ..chat import chat_provider
+from langchain.prompts import PromptTemplate
 
 logger = log()
 
@@ -86,8 +87,13 @@ class PromptMagic(Magics):
             exist = dict.get(chat_key)
             if exist:
                 executor = exist.to_executor()
-                res = executor.run(prompt)
+                # Use langchain prompt to support prompt templates and other features
+                template = PromptTemplate.from_template(prompt)
+                formattedPrompt = template.invoke(local_ns)
+                res = executor.run(formattedPrompt)
+                # Convert results into formattable conversational output
                 display_res = executor.result_to_str(res)
+                # Set variable
                 try:
                     if "variable_name" in args:
                         variable_name:str = args["variable_name"]
@@ -96,6 +102,7 @@ class PromptMagic(Magics):
                         local_ns[variable_name] = res
                 except Exception as e:
                     raise Exception("set variable error", e)
+                # Return result
                 return MimeTypeForPrompt(val={"data": display_res})
         else:
             raise Exception("Chat executor for %s not found!" % chat_key)
