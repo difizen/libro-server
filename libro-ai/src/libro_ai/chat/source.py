@@ -1,5 +1,3 @@
-
-
 CHAT_SOURCE = {
     "LLM": "LLM",
     "API": "API",
