@@ -1,11 +1,7 @@
-import traceback
-
-from IPython.core.getipython import get_ipython
-from IPython.core.magic import register_line_magic
-from IPython.core.ultratb import ListTB
+from IPython import InteractiveShell
 
 
-def store_exception(shell, etype, evalue, tb, tb_offset=None):
+def store_exception(shell: InteractiveShell, etype: type, evalue, tb, tb_offset=None):
     # A structured traceback (a list of strings) or None
 
     if issubclass(etype, SyntaxError):

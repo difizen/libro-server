@@ -1,10 +1,10 @@
 from typing import Dict, List
 
 from .source import CHAT_SOURCE
-from .item import ChatItem, ChatItemProvider
+from .object import ChatObject, ChatObjects
 from .executor import ChatExecutor
 from ..utils.langchain import get_langchain_variable_dict_list, is_langchain_installed
-class LangChainVariableChatItemProvider(ChatItemProvider):
+class LangChainVariableChatObjectProvider(ChatObjects):
     name: str = "langchain_variable"
     cache: Dict[str, ChatExecutor] = {}
 
@@ -16,8 +16,8 @@ class LangChainVariableChatItemProvider(ChatItemProvider):
         self.cache[v["name"]] = executor
         return executor
 
-    def list(self) -> List[ChatItem]:
+    def list(self) -> List[ChatObject]:
         if not is_langchain_installed():
             return []
         variables = get_langchain_variable_dict_list()
-        return map(lambda v: ChatItem(name=v["name"], to_executor=lambda:self.get_or_create_executor(v), type=CHAT_SOURCE["VARIABLE"]), variables)
+        return map(lambda v: ChatObject(name=v["name"], to_executor=lambda:self.get_or_create_executor(v), type=CHAT_SOURCE["VARIABLE"]), variables)
