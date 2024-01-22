@@ -6,7 +6,7 @@ from typing import Callable
 from .source import CHAT_SOURCE
 from .executor import ChatExecutor
 
-class ChatItem(BaseModel):
+class ChatObject(BaseModel):
     name: str = None
     type: str = CHAT_SOURCE["CUSTOM"]
     order: int = 0
@@ -23,9 +23,9 @@ class ChatItem(BaseModel):
             "key":self.key
         }
 
-class ChatItemProvider(BaseModel, ABC):
+class ChatObjectProvider(BaseModel, ABC):
     name: str = "custom"
 
     @abstractmethod
-    def list(self) -> List[ChatItem]:
+    def list(self) -> List[ChatObject]:
         """List chat executors."""

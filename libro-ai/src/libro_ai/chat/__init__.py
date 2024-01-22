@@ -1,11 +1,12 @@
-from .executor import  LLMChat,ChatExecutor
-from .openai import OpenAIChatItemProvider,DALLEChatItemProvider
-from .item import ChatItem, ChatItemProvider
+from .executor import LLMChat, ChatExecutor
+from .openai import OpenAIChatObjectProvider, DALLEChatObjectProvider
+from .openai import OpenAIChatObjectProvider
+from .object_manager import ChatObjectManager
 from .source import CHAT_SOURCE
-from .provider import ChatProvider
-from .langchain_variable import LangChainVariableChatItemProvider
+from .object import ChatObject, ChatObjectProvider
+from .langchain_variable import LangChainVariableChatObjectProvider
 
-chat_provider = ChatProvider()
-chat_provider.register_provider(OpenAIChatItemProvider())
-chat_provider.register_provider(DALLEChatItemProvider())
-chat_provider.register_provider(LangChainVariableChatItemProvider())
+chat_object_manager = ChatObjectManager()
+chat_object_manager.register_provider(OpenAIChatObjectProvider())
+chat_object_manager.register_provider(DALLEChatObjectProvider())
+chat_object_manager.register_provider(LangChainVariableChatObjectProvider())

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from ast import arg
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
-from ..chat import chat_provider
+from ..chat import chat_object_manager
 from langchain.prompts import PromptTemplate
 
 logger = log()
@@ -79,10 +78,9 @@ class PromptMagic(Magics):
                 args
             ) = preprocessing_cell_prompt(cell, local_ns)
 
-
         chat_key:str = args["model_name"]
         prompt:str = args["prompt"]
-        dict = chat_provider.get_provider_dict()
+        dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
             exist = dict.get(chat_key)
             if exist:
