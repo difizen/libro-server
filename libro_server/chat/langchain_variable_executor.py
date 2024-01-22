@@ -26,9 +26,15 @@ class LangChainVariableChat(ChatExecutor):
             return self.runChat(v,value,**kwargs)
         else:
             return None
-    def result_to_str(self,value,**kwargs):
+    def display(self,value,**kwargs):
         if isinstance(value, str):
-            return value
+            data = {
+                "application/vnd.libro.prompt+json": value
+            }
+            display(data, raw=True)
         if isinstance(value, AIMessage):
-            return value.content
+            data = {
+                "application/vnd.libro.prompt+json": value.content
+            }
+            display(data, raw=True)
         return self.run(value,**kwargs)
