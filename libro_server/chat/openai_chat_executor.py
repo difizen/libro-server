@@ -9,7 +9,9 @@ from ..utils import is_langchain_installed
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage
 from langchain.callbacks import get_openai_callback
+from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from IPython.display import display
+from IPython.display import HTML
 
 class OpenAIChat(LLMChat):
     name: str = "chatgpt"
@@ -50,3 +52,31 @@ class OpenAIChat(LLMChat):
             }
             display(data, raw=True)
         return self.run(value,**kwargs)
+
+class DalleChat(LLMChat):
+    name: str = "dalle-3"
+    model: str = Field(default="dall-e-3")
+    dalle: DallEAPIWrapper = None
+    def load(self):
+        if is_langchain_installed():
+            self.dalle = DallEAPIWrapper()
+            self.dalle.model_name = self.model
+            return True
+        return False
+    def run(self,value,**kwargs):
+        if not self.dalle:
+            self.load()
+        try:
+            if not self.dalle:
+                raise Exception("Chat model not loaded")
+            dalle = self.dalle
+            result = dalle.run(value.text)
+            return result
+        except Exception as e:
+            return ""
+    def display(self,value,**kwargs):
+        data = {
+            "text/html": f'<img src = {value}>'
+        }
+        display(data, raw=True)
+        # HTML(f'<img src = {value}>',raw=True)
