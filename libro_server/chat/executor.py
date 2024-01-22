@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 from pydantic import BaseModel
+from IPython.display import display
 from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 class ChatExecutor(BaseModel, ABC):
@@ -13,11 +14,13 @@ class ChatExecutor(BaseModel, ABC):
     ) -> str:
         """Chat and get result."""
     
-    @abstractmethod
-    def result_to_str(
+    def display(
         self,value,**kwargs,
     ) -> str:
-        """Display result."""
+        data = {
+            "application/vnd.libro.prompt+json": value
+        }
+        display(data, raw=True)
 
 class LLMChat(ChatExecutor):
     name: str = "custom"

@@ -91,8 +91,7 @@ class PromptMagic(Magics):
                 template = PromptTemplate.from_template(prompt)
                 formattedPrompt = template.invoke(local_ns)
                 res = executor.run(formattedPrompt)
-                # Convert results into formattable conversational output
-                display_res = executor.result_to_str(res)
+                display_res = executor.display(res)
                 # Set variable
                 try:
                     if "variable_name" in args:
@@ -102,7 +101,5 @@ class PromptMagic(Magics):
                         local_ns[variable_name] = res
                 except Exception as e:
                     raise Exception("set variable error", e)
-                # Return result
-                return MimeTypeForPrompt(val={"data": display_res})
         else:
             raise Exception("Chat executor for %s not found!" % chat_key)

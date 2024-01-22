@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional
 from pydantic import Field
+from IPython.display import display
 
 from .source import CHAT_SOURCE
 
