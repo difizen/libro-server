@@ -4,18 +4,45 @@ from .app import LibroApp
 
 from .magics import load_ipython_extension, unload_ipython_extension
 
-from .chat import chat_object_manager, ChatObjectProvider, ChatExecutor, ChatObject, ChatObjectProvider
+from .chat import (
+    chat_object_manager,
+    ChatObjectProvider,
+    ChatExecutor,
+    ChatObject,
+    ChatObjectProvider,
+    chat_record_provider,
+)
 
-from .utils import is_ipython, is_langchain_installed,  get_variable_list, get_variable_dict_list, get_langchain_variable_dict_list
+from .utils import (
+    is_ipython,
+    is_langchain_installed,
+    get_variable_list,
+    get_variable_dict_list,
+    get_langchain_variable_dict_list,
+)
+
 
 def _jupyter_server_extension_points():
     """
     Returns a list of dictionaries with metadata describing
     where to find the `_load_jupyter_server_extension` function.
     """
-    return [
-        {
-            "module": "libro_server",
-            "app": LibroApp
-        }
-    ]
+    return [{"module": "libro_server", "app": LibroApp}]
+
+
+__all__ = [
+    "LibroApp",
+    "load_ipython_extension",
+    "unload_ipython_extension",
+    "chat_object_manager",
+    "ChatObjectProvider",
+    "ChatExecutor",
+    "ChatObject",
+    "ChatObjectProvider",
+    "is_ipython",
+    "is_langchain_installed",
+    "get_variable_list",
+    "get_variable_dict_list",
+    "get_langchain_variable_dict_list",
+    "chat_record_provider",
+]
