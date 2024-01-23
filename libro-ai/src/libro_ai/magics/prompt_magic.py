@@ -3,8 +3,9 @@
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
-from ..chat import chat_object_manager
+from ..chat import chat_object_manager, chat_record_provider
 from langchain.prompts import PromptTemplate
+from langchain_core.messages import BaseMessage, AIMessage
 
 logger = log()
 
@@ -22,7 +23,7 @@ def preprocessing_line_prompt(line, local_ns):
         # 替换prompt content变量
         if prompt:
             for key, value in local_ns.items():
-                if not key.startswith("_"):
+                if key and not key.startswith("_"):
                     prompt = prompt.replace("{{" + key + "}}", str(value))
             json_obj["prompt"] = prompt
         return json_obj
@@ -42,7 +43,7 @@ def preprocessing_cell_prompt(cell, local_ns):
         # 替换prompt content变量
         if prompt:
             for key, value in local_ns.items():
-                if not key.startswith("_"):
+                if key and not key.startswith("_"):
                     prompt = prompt.replace("{{" + key + "}}", str(value))
             json_obj["prompt"] = prompt
         return json_obj
@@ -83,28 +84,41 @@ class PromptMagic(Magics):
 
         chat_key: str = args["model_name"]
         prompt: str = args["prompt"]
+        cell_id: str = args["cell_id"]
+        record_id: str = args.get("record")
+        variable_name: str = args.get("variable_name")
         dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
-            exist = dict.get(chat_key)
-            if exist:
-                executor = exist.to_executor()
+            object = dict.get(chat_key)
+            if object:
+                executor = object.to_executor()
                 # Use langchain prompt to support prompt templates and other features
                 template = PromptTemplate.from_template(prompt)
                 formattedPrompt = template.invoke(local_ns)
-                res = executor.run(formattedPrompt)
-                display_res = executor.display(res)
+
+                res = None
+                if cell_id and record_id:
+                    record = chat_record_provider.get_record(record_id)
+                    record.append_messages(
+                        cell_id, formattedPrompt.to_messages(), reset=True
+                    )
+                    res = executor.run(record.get_messages())
+                    if res and isinstance(res, BaseMessage):
+                        record.append_message(cell_id, res)
+                    if res and isinstance(res, str):
+                        record.append_message(cell_id, AIMessage(content=res))
+                else:
+                    res = executor.run(formattedPrompt)
+                executor.display(res)
                 # Set variable
                 try:
-                    if "variable_name" in args:
-                        variable_name: str = args["variable_name"]
-                        if (
-                            variable_name
-                            and variable_name != ""
-                            and not variable_name.isidentifier()
-                        ):
-                            raise Exception(
-                                'Invalid variable name "{}".'.format(variable_name)
-                            )
+                    if variable_name is None or variable_name == "":
+                        return
+                    if not variable_name.isidentifier():
+                        raise Exception(
+                            'Invalid variable name "{}".'.format(variable_name)
+                        )
+                    else:
                         local_ns[variable_name] = res
                 except Exception as e:
                     raise Exception("set variable error", e)

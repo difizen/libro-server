@@ -15,14 +15,14 @@ class ChatExecutor(BaseModel, ABC):
         self,
         value,
         **kwargs,
-    ) -> str:
+    ) -> Any:
         """Chat and get result."""
 
     def display(
         self,
         value,
         **kwargs,
-    ) -> str:
+    ):
         data = {"application/vnd.libro.prompt+json": value}
         if is_ipython():
             from IPython.display import display
