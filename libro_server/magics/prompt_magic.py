@@ -3,8 +3,9 @@
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
-from ..chat import chat_object_manager
+from ..chat import chat_object_manager, chat_record_provider
 from langchain.prompts import PromptTemplate
+from langchain_core.messages import BaseMessage, AIMessage
 
 logger = log()
 
@@ -83,16 +84,33 @@ class PromptMagic(Magics):
 
         chat_key: str = args["model_name"]
         prompt: str = args["prompt"]
+        cell_id: str = args["cell_id"]
+        record_id: str = args["record"]
         dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
-            exist = dict.get(chat_key)
-            if exist:
-                executor = exist.to_executor()
+            object = dict.get(chat_key)
+            if object:
+                executor = object.to_executor()
                 # Use langchain prompt to support prompt templates and other features
                 template = PromptTemplate.from_template(prompt)
                 formattedPrompt = template.invoke(local_ns)
-                res = executor.run(formattedPrompt)
-                display_res = executor.display(res)
+
+                res = None
+                if cell_id and record_id:
+                    record = chat_record_provider.get_record(record_id)
+
+                    record.append_messages(
+                        cell_id, formattedPrompt.to_messages(), reset=True
+                    )
+                    res = executor.run(record.get_messages())
+                    if res and isinstance(res, BaseMessage):
+                        record.append_message(cell_id, res)
+                    if res and isinstance(res, str):
+                        record.append_message(cell_id, AIMessage(content=res))
+
+                else:
+                    res = executor.run(formattedPrompt)
+                executor.display(res)
                 # Set variable
                 try:
                     if "variable_name" in args:
