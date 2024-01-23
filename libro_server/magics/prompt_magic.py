@@ -23,7 +23,7 @@ def preprocessing_line_prompt(line, local_ns):
         # 替换prompt content变量
         if prompt:
             for key, value in local_ns.items():
-                if not key.startswith("_"):
+                if key and not key.startswith("_"):
                     prompt = prompt.replace("{{" + key + "}}", str(value))
             json_obj["prompt"] = prompt
         return json_obj
@@ -43,7 +43,7 @@ def preprocessing_cell_prompt(cell, local_ns):
         # 替换prompt content变量
         if prompt:
             for key, value in local_ns.items():
-                if not key.startswith("_"):
+                if key and not key.startswith("_"):
                     prompt = prompt.replace("{{" + key + "}}", str(value))
             json_obj["prompt"] = prompt
         return json_obj
@@ -85,7 +85,8 @@ class PromptMagic(Magics):
         chat_key: str = args["model_name"]
         prompt: str = args["prompt"]
         cell_id: str = args["cell_id"]
-        record_id: str = args["record"]
+        record_id: str = args.get("record")
+        variable_name: str = args.get("variable_name")
         dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
             object = dict.get(chat_key)
@@ -98,7 +99,6 @@ class PromptMagic(Magics):
                 res = None
                 if cell_id and record_id:
                     record = chat_record_provider.get_record(record_id)
-
                     record.append_messages(
                         cell_id, formattedPrompt.to_messages(), reset=True
                     )
@@ -107,22 +107,18 @@ class PromptMagic(Magics):
                         record.append_message(cell_id, res)
                     if res and isinstance(res, str):
                         record.append_message(cell_id, AIMessage(content=res))
-
                 else:
                     res = executor.run(formattedPrompt)
                 executor.display(res)
                 # Set variable
                 try:
-                    if "variable_name" in args:
-                        variable_name: str = args["variable_name"]
-                        if (
-                            variable_name
-                            and variable_name != ""
-                            and not variable_name.isidentifier()
-                        ):
-                            raise Exception(
-                                'Invalid variable name "{}".'.format(variable_name)
-                            )
+                    if variable_name is None or variable_name == "":
+                        return
+                    if not variable_name.isidentifier():
+                        raise Exception(
+                            'Invalid variable name "{}".'.format(variable_name)
+                        )
+                    else:
                         local_ns[variable_name] = res
                 except Exception as e:
                     raise Exception("set variable error", e)
