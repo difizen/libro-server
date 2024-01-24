@@ -20,13 +20,13 @@ gateway = 'jupyter lab --config=./dev-config/jupyter_server_config.py --debug --
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<3.12"
-jupyter-server = ">=1.24.0"
+jupyter-server = ">=2.10.0"
 jupyterlab-server = "^2.24.0"
 ipykernel = "^6.16.2"
 ipython = ">=7.34.0"
 jupyter-lsp = "^2.2.0"
 python-lsp-server = "^1.8.2"
-ruff = "^0.0.291"
+ruff = "^0.1.14"
 ruff-lsp = "^0.0.49"
 langchain = "^0.1.0"
 
