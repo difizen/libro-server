@@ -5,6 +5,7 @@ from .source import CHAT_SOURCE
 from .object import ChatObject, ChatObjectProvider
 from .langchain_variable import LangChainVariableChatObjectProvider
 from .chat_record import ChatMessage, ChatRecord, ChatRecordProvider
+from .utils import get_message_str
 
 chat_object_manager = ChatObjectManager()
 chat_object_manager.register_provider(OpenAIChatObjectProvider())
