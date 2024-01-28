@@ -3,6 +3,7 @@
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from notebook.base.handlers import log
+from openai import chat
 from ..chat import chat_object_manager, chat_record_provider
 from langchain.prompts import PromptTemplate
 from langchain_core.messages import BaseMessage, AIMessage
@@ -82,9 +83,19 @@ class PromptMagic(Magics):
         else:
             (args) = preprocessing_cell_prompt(cell, local_ns)
 
-        chat_key: str = args["model_name"]
-        prompt: str = args["prompt"]
-        cell_id: str = args["cell_id"]
+        chat_key: str = args.get("chat_key")
+        if chat_key is None or chat_key == "":
+            chat_key = args.get("model_name")
+        prompt: str = args.get("prompt")
+        cell_id: str = args.get("cell_id")
+
+        if (
+            (chat_key is None or chat_key == "")
+            or (prompt is None or prompt == "")
+            or (cell_id is None or cell_id == "")
+        ):
+            raise Exception("Invalid prompt parameters!")
+
         record_id: str = args.get("record")
         variable_name: str = args.get("variable_name")
         dict = chat_object_manager.get_object_dict()
