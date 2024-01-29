@@ -1,4 +1,5 @@
 # Configuration file for jupyter-server.
+import os
 
 c = get_config()  # noqa
 
@@ -1750,6 +1751,10 @@ c.ServerApp.token = ""
 # c.ZMQChannelsWebsocketConnection.session = None
 
 
+
+os.environ['LIBRO_ANALYZER_WORKING_DIR'] = os.path.join(os.getcwd(), '/examples')
+
+c.LanguageServerManager.autodetect = False
 # c is a magic, lazy variable
 c.LanguageServerManager.language_servers = {
     "ruff-lsp": {
@@ -1761,5 +1766,17 @@ c.LanguageServerManager.language_servers = {
         "version": 2,
         "mime_types": ["text/x-python"],
         "display_name": "ruff-lsp",
+    },
+    "libro-analyzer": {
+        # if installed as a binary
+        "argv": [
+            "node",
+            "node_modules/@difizen/libro-analyzer/index.js",
+            "--stdio",
+        ],
+        "languages": ["python"],
+        "version": 2,
+        "mime_types": ["text/x-python"],
+        "display_name": "libro-analyzer",
     },
 }
