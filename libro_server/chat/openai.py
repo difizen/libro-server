@@ -44,9 +44,9 @@ class OpenAIChatObjectProvider(ChatObjectProvider):
         model = ALIASE_NAME_MODEL.get(name, name)
         if model in self.cache:
             return self.cache[model]
-        from .openai_chat_executor import OpenAIChat
+        from .openai_chat_executor import DalleChat
 
-        executor = OpenAIChat(model=model, name=name)
+        executor = DalleChat(model=model, name=name)
         if executor.load():
             self.cache[model] = executor
         return executor
