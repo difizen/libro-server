@@ -51,7 +51,6 @@ class LibroNotebookClient(NotebookClient):
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
             self.set_widgets_metadata()
-            print(self.nb)
         return self.output_path
 
     execute = run_sync(async_execute)
