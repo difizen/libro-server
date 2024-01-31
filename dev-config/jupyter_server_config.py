@@ -340,9 +340,10 @@ c.ServerApp.disable_check_xsrf = True
 #  be used to enable and disable the loading ofthe extensions. The extensions
 #  will be loaded in alphabetical order.
 #  Default: {}
-# c.ServerApp.jpserver_extensions = {
-#     "jupyter_lsp": True,
-# }
+c.ServerApp.jpserver_extensions = {
+    "libro_server": True,
+    "jupyter_lsp": True,
+}
 
 # The kernel manager class to use.
 #  Default: 'jupyter_server.services.kernels.kernelmanager.MappingKernelManager'
