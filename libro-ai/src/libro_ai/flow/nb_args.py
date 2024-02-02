@@ -23,7 +23,7 @@ def define_nb_args(ArgsModel:BaseModel):
     data = {"application/vnd.libro.args+json": args_metadata}
     display(data, raw=True)
 
-def to_nb_output(output,output_path = None):
+def to_nb_output(output,output_variable_path = None):
     import pickle
     from IPython import get_ipython
     import tempfile
@@ -31,42 +31,43 @@ def to_nb_output(output,output_path = None):
     import os
     ipython = get_ipython()
     try:
-        to_output_path = ipython.user_ns['__libro_output__']
+        to_output_variable_path = ipython.user_ns['__libro_output__']
     except KeyError:
-        to_output_path = output_path
-    if to_output_path is None:
+        to_output_variable_path = output_variable_path
+    if to_output_variable_path is None:
         libro_output_dir = tempfile.mkdtemp()
         _uuid = uuid.uuid4().hex[:16].lower()
         libro_output_name = "libro_output_" + _uuid + ".pickle"
-        to_output_path = os.path.join(libro_output_dir, libro_output_name)
-        ipython.user_ns['__libro_output__'] = to_output_path
-    if not to_output_path.endswith('.pickle'):
+        to_output_variable_path = os.path.join(libro_output_dir, libro_output_name)
+        ipython.user_ns['__libro_output__'] = to_output_variable_path
+    if not to_output_variable_path.endswith('.pickle'):
         raise Exception("Output path should endwith .pickle!")
     # 将数据序列化为字节流
-    with open(to_output_path, 'wb') as f:
+    with open(to_output_variable_path, 'wb') as f:
         pickle.dump(output, f)
-    return to_output_path
+    return to_output_variable_path
 
-def load_nb_output(output_path):
+def load_nb_output(output_variable_path):
     import pickle
-    with open(output_path, 'rb') as f:
+    with open(output_variable_path, 'rb') as f:
         nb_output = pickle.load(f)
     return nb_output
 
-def load_notebook_node(notebook_path):
+def load_notebook_node(input_notebook_path):
     import nbformat
-    nb = nbformat.read(notebook_path, as_version=4)
+    nb = nbformat.read(input_notebook_path, as_version=4)
     nb_upgraded = nbformat.v4.upgrade(nb)
     if nb_upgraded is not None:
         nb = nb_upgraded
     return nb
 
 def execute_notebook(
-    notebook_path:str,
+    input_notebook_path:str,
+    output_notebook_path= None,
     parameters = None,
-    output_path = None,
+    output_variable_path = None,
     km: Union[KernelManager, None] = None,
     **kwargs: Any,
 ) -> NotebookNode:
-    nb = load_notebook_node(notebook_path)
-    return LibroNotebookClient(nb=nb, output_path=output_path, km=km, parameters=parameters, **kwargs).execute()
+    nb = load_notebook_node(input_notebook_path)
+    return LibroNotebookClient(nb=nb, output_variable_path=output_variable_path, output_notebook_path = output_notebook_path, km=km, parameters=parameters, **kwargs).execute()
