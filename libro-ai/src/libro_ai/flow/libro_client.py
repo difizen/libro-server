@@ -1,19 +1,19 @@
 from nbclient import NotebookClient
-from nbclient.exceptions import CellExecutionError
 from nbclient.util import ensure_async,run_sync
+import nbformat
 from nbformat import NotebookNode
-from traitlets import Bool, Instance
 from typing import Any
 import json
 
 class LibroNotebookClient(NotebookClient):
-    def __init__(self, nb: NotebookNode, output_path = None,parameters=None,km=None, raise_on_iopub_timeout=True, **kw):
+    def __init__(self, nb: NotebookNode, output_variable_path = None, output_notebook_path = None, parameters=None,km=None, raise_on_iopub_timeout=True, **kw):
         super().__init__(nb=nb, km=km, **kw)
         if isinstance(parameters, dict):
             self.parameters = json.dumps(parameters)
         else:
             self.parameters = parameters
-        self.output_path = output_path
+        self.output_variable_path = output_variable_path
+        self.output_notebook_path = output_notebook_path
 
     async def async_execute(self, reset_kc: bool = False, **kwargs: Any) -> NotebookNode:
         if reset_kc and self.owns_km:
@@ -39,10 +39,10 @@ class LibroNotebookClient(NotebookClient):
                     f"__libro_input_dict__={self.parameters}\n", store_history=True, stop_on_error=not cell_allows_errors
                 )
             )
-            if self.output_path is not None:
+            if self.output_variable_path is not None:
                 await ensure_async(
                     self.kc.execute(
-                        f"__libro_output__='{self.output_path}'\n", store_history=True, stop_on_error=not cell_allows_errors
+                        f"__libro_output__='{self.output_variable_path}'\n", store_history=True, stop_on_error=not cell_allows_errors
                     )
                 )
             
@@ -50,7 +50,10 @@ class LibroNotebookClient(NotebookClient):
                 await self.async_execute_cell(
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
+                if self.output_notebook_path is not None:
+                    with open(self.output_notebook_path, 'w', encoding='utf-8') as f:
+                        nbformat.write(self.nb, f) 
             self.set_widgets_metadata()
-        return self.output_path
+        return self.output_variable_path
 
     execute = run_sync(async_execute)
