@@ -1,9 +1,11 @@
 from nbclient import NotebookClient
 from nbclient.util import ensure_async,run_sync
 import nbformat
+import datetime
 from nbformat import NotebookNode
 from typing import Any
 import json
+from traitlets import Callable
 
 class LibroNotebookClient(NotebookClient):
     def __init__(self, nb: NotebookNode, output_variable_path = None, output_notebook_path = None, parameters=None,km=None, raise_on_iopub_timeout=True, **kw):
@@ -14,6 +16,16 @@ class LibroNotebookClient(NotebookClient):
             self.parameters = parameters
         self.output_variable_path = output_variable_path
         self.output_notebook_path = output_notebook_path
+        self.start_time = None
+        self.end_time = None
+
+    def cellStartExecution(cell,**kwargs):
+        cell.metadata.execution['shell.execute_reply.started'] = datetime.datetime.utcnow().isoformat()
+    
+    on_cell_execute = Callable(
+        default_value= cellStartExecution,
+        allow_none=True,
+    ).tag(config=True)
 
     async def async_execute(self, reset_kc: bool = False, **kwargs: Any) -> NotebookNode:
         if reset_kc and self.owns_km:
@@ -34,6 +46,8 @@ class LibroNotebookClient(NotebookClient):
                         "Content is:\n" + str(info_msg["content"])
                     )
             cell_allows_errors = (not self.force_raise_errors) and (self.allow_errors)
+            self.start_time = datetime.datetime.utcnow()
+            self.nb.metadata['start_time'] = self.start_time.isoformat()
             await ensure_async(
                 self.kc.execute(
                     f"__libro_input_dict__={self.parameters}\n", store_history=True, stop_on_error=not cell_allows_errors
@@ -50,10 +64,13 @@ class LibroNotebookClient(NotebookClient):
                 await self.async_execute_cell(
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
+                cell.metadata.execution['shell.execute_reply.end'] = datetime.datetime.utcnow().isoformat()
                 if self.output_notebook_path is not None:
                     with open(self.output_notebook_path, 'w', encoding='utf-8') as f:
                         nbformat.write(self.nb, f) 
             self.set_widgets_metadata()
+            self.end_time = datetime.datetime.utcnow()
+            self.nb.metadata['end_time'] = self.start_time.isoformat()
         return self.output_variable_path
 
     execute = run_sync(async_execute)
