@@ -3,7 +3,7 @@ from nbformat import NotebookNode
 from IPython.display import display
 from .libro_client import LibroNotebookClient
 from jupyter_client.manager import KernelManager
-from typing import Any,Union
+from typing import Any,Union,Callable
 import tempfile
 import uuid
 
@@ -62,11 +62,17 @@ def load_notebook_node(notebook_path):
     return nb
 
 def execute_notebook(
-    notebook_path:str,
-    parameters = None,
+    notebook:Any,
     output_path = None,
+    parameters = None,
+    echo = None,
+    notebook_parser: Callable = None,
+    echo_processor: Callable = None,
     km: Union[KernelManager, None] = None,
     **kwargs: Any,
 ) -> NotebookNode:
-    nb = load_notebook_node(notebook_path)
-    return LibroNotebookClient(nb=nb, output_path=output_path, km=km, parameters=parameters, **kwargs).execute()
+    if notebook_parser is not None:
+        nb = notebook_parser(notebook)
+    else:
+        nb = load_notebook_node(notebook)
+    return LibroNotebookClient(nb=nb, output_path=output_path, echo = echo, km=km, parameters=parameters, echo_processor = echo_processor, **kwargs).execute()
