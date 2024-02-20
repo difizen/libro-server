@@ -8,14 +8,15 @@ import json
 from traitlets import Callable
 
 class LibroNotebookClient(NotebookClient):
-    def __init__(self, nb: NotebookNode, output_variable_path = None, output_notebook_path = None, parameters=None,km=None, raise_on_iopub_timeout=True, **kw):
+    def __init__(self, nb: NotebookNode, output_path = None, echo = None, parameters=None,km=None, echo_processor:Callable = None, **kw):
         super().__init__(nb=nb, km=km, **kw)
         if isinstance(parameters, dict):
             self.parameters = json.dumps(parameters)
         else:
             self.parameters = parameters
-        self.output_variable_path = output_variable_path
-        self.output_notebook_path = output_notebook_path
+        self.output_path = output_path
+        self.echo = echo
+        self.echo_processor = echo_processor
         self.start_time = None
         self.end_time = None
 
@@ -53,10 +54,10 @@ class LibroNotebookClient(NotebookClient):
                     f"__libro_input_dict__={self.parameters}\n", store_history=True, stop_on_error=not cell_allows_errors
                 )
             )
-            if self.output_variable_path is not None:
+            if self.output_path is not None:
                 await ensure_async(
                     self.kc.execute(
-                        f"__libro_output__='{self.output_variable_path}'\n", store_history=True, stop_on_error=not cell_allows_errors
+                        f"__libro_output__='{self.output_path}'\n", store_history=True, stop_on_error=not cell_allows_errors
                     )
                 )
             
@@ -65,12 +66,15 @@ class LibroNotebookClient(NotebookClient):
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
                 cell.metadata.execution['shell.execute_reply.end'] = datetime.datetime.utcnow().isoformat()
-                if self.output_notebook_path is not None:
-                    with open(self.output_notebook_path, 'w', encoding='utf-8') as f:
-                        nbformat.write(self.nb, f) 
+                if self.echo is not None:
+                    with open(self.echo, 'w', encoding='utf-8') as f:
+                        nbformat.write(self.nb, f)
+                if  self.echo_processor is not None:
+                    log = self.echo_processor(cell,index)
             self.set_widgets_metadata()
             self.end_time = datetime.datetime.utcnow()
             self.nb.metadata['end_time'] = self.start_time.isoformat()
-        return self.output_variable_path
+            log = None
+        return self.output_path,log
 
     execute = run_sync(async_execute)
