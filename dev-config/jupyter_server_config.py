@@ -433,7 +433,7 @@ c.ServerApp.jpserver_extensions = {
 #                          module, unless it is overridden using the --browser
 #                          (ServerApp.browser) configuration option.
 #  Default: False
-# c.ServerApp.open_browser = False
+c.ServerApp.open_browser = False
 
 # DEPRECATED in 2.0. Use PasswordIdentityProvider.hashed_password
 #  Default: ''
