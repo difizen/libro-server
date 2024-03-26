@@ -6,7 +6,7 @@ from jupyterlab_server import LabConfig, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
 from os.path import relpath
 
-from libro_server.handler import LibroLabHandler
+from libro_server.handler import LibroLabHandler, LibroWorkspaceHandler
 
 DEFAULT_STATIC_FILES_PATH = os.path.join(os.path.dirname(__file__), "static")
 DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "templates")
@@ -60,6 +60,7 @@ class LibroApp(ExtensionAppJinjaMixin, LabConfig, ExtensionApp):
         # LIBRO_URL_PATTERN = (r"/(?P<libro>/libro/.*)?")
         # url_pattern = LIBRO_URL_PATTERN.format(self.app_url.replace("/", ""))
         self.handlers.append((rf"/{self.name}/?", LibroLabHandler))
+        self.handlers.append((rf"/{self.name}/api/workspace", LibroWorkspaceHandler))
         add_handlers(self.handlers, self)
 
 # -----------------------------------------------------------------------------

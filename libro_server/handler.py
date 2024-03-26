@@ -1,4 +1,5 @@
-from jupyter_server.base.handlers import JupyterHandler
+import json
+from jupyter_server.base.handlers import JupyterHandler, APIHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerMixin,
     ExtensionHandlerJinjaMixin
@@ -52,3 +53,10 @@ class LibroLabHandler(LabHandler):
         # Write the template with the config.
         tpl = self.render_template("libro.html", page_config=page_config)  # type:ignore[no-untyped-call]
         self.write(tpl)
+
+class LibroWorkspaceHandler(APIHandler):
+    async def get(
+        self
+    ) -> None:
+        page_config = self.settings.get('page_config_data')
+        self.write(json.dumps(page_config))
