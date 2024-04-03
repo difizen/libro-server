@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "libro"
-version = "0.1.2"
+name = "libro-ai"
+version = "0.1.0"
 description = ""
 authors = ["zhanba <c5e1856@gmail.com>", "brokun <brokun0128@gmail.com>"]
 readme = "README.md"
@@ -26,11 +26,19 @@ ipykernel = "^6.16.2"
 ipython = ">=7.34.0"
 jupyter-lsp = "^2.2.0"
 ruff-lsp = ">=0.0.50"
+langchain = "^0.1.0"
+nbclient = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
+pandas = "^1.5.1"
+transformers = "^4.31.0"
+matplotlib = "^3.7.2"
+pandas-stubs = "^1.5.3"
 poethepoet = "^0.21.1"
 twine = "^4.0.2"
 jupyterlab = "^3.6.5"
+yapf = "^0.40.2"
+langchain_openai = "^0.0.2"
 
 
 [build-system]
