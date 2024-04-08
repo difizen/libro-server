@@ -1,38 +1,41 @@
-# libro server
+# Libro
 
-## env setup
-
-install python >=3.8
-
-install poetry # 更好的包管理器
+## 使用
 
 ```sh
-curl -sSL https://install.python-poetry.org | python3 -
+pip install libro libro-ai
+libro
 ```
 
-进入 python 虚拟环境，安装依赖包
 
-```sh
-cd libro_server
-poetry shell
-poetry install
-```
+## 开发
 
-## dev
+本项目包含lab目录下的libro-lab前端工程和libro-server、libro-ai两个python包，分别在libro-server和libro-ai目录下。
 
-启动开发服务器
+### libro-lab
 
-```sh
-# open libro server in dev mode
-poe dev
-```
+- npm install
+- npm run build
+- npm run deploy
 
-Libro Server 默认使用基于 [libro-lab](https://github.com/difizen/libro/tree/main/packages/libro-lab) 的前端应用，作为前端静态资源
+### python
 
-## pub
+我们使用rye来管理多python包组成monorepo，多个包会共享同一个虚拟环境venv
 
-```sh
-rm -rf dist
-poetry build
-twine upload dist/*
-```
+- install `rye` `npm`
+- cd libro-server
+- rye sync
+
+### libro-server
+
+- cd libro-server/libro-server
+- npm i
+- rye run dev
+- rye build
+- rye publish
+
+### libro-ai
+
+- cd libro-ai/libro-ai
+- rye build
+- rye publish
