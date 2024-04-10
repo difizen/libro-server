@@ -1,6 +1,10 @@
 from ._version import __version__
 
-from .magics import load_ipython_extension, unload_ipython_extension
+from .extensions import (
+    load_ipython_extension,
+    unload_ipython_extension,
+    _load_jupyter_server_extension,
+)
 
 from .flow import define_nb_args, execute_notebook, to_nb_output, load_nb_output
 

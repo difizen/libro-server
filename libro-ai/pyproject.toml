@@ -3,11 +3,12 @@ name = "libro-ai"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
+    { name = "brokun", email = "brokun0128@gmail.com" },
     { name = "zhanba", email = "c5e1856@gmail.com" }
 ]
 dependencies = [
-    "langchain>=0.1.14",
-    "ipython>=8.23.0",
+    "langchain>=0.1.0",
+    "ipython>=7.34.0",
     "pydantic>=2.6.4",
     "requests>=2.31.0",
     "nbclient>=0.10.0",

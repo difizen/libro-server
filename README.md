@@ -7,28 +7,27 @@ pip install libro libro-ai
 libro
 ```
 
-
 ## 开发
 
-本项目包含lab目录下的libro-lab前端工程和libro-server、libro-ai两个python包，分别在libro-server和libro-ai目录下。
+本项目包含 lab 目录下的 libro-lab 前端工程和 libro-server、libro-ai 两个 python 包，分别在 libro-server 和 libro-ai 目录下。
+
+### 基础环境
+
+我们使用 rye 来管理多 python 包组成 monorepo，多个包会共享同一个虚拟环境 venv
+
+- install `rye` `npm`
+- rye sync
 
 ### libro-lab
 
+- cd lab
 - npm install
 - npm run build
 - npm run deploy
 
-### python
-
-我们使用rye来管理多python包组成monorepo，多个包会共享同一个虚拟环境venv
-
-- install `rye` `npm`
-- cd libro-server
-- rye sync
-
 ### libro-server
 
-- cd libro-server/libro-server
+- cd libro-server
 - npm i
 - rye run dev
 - rye build
@@ -36,6 +35,6 @@ libro
 
 ### libro-ai
 
-- cd libro-ai/libro-ai
+- cd libro-ai
 - rye build
 - rye publish
