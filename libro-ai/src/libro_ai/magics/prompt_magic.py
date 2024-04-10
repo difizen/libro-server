@@ -2,12 +2,9 @@
 
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
-from notebook.base.handlers import log  # type: ignore
 from ..chat import chat_object_manager, chat_record_provider
 from langchain.prompts import PromptTemplate
 from langchain_core.messages import BaseMessage, AIMessage
-
-logger = log()
 
 
 def preprocessing_line_prompt(line, local_ns):
