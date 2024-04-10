@@ -4,7 +4,7 @@ version = "0.1.2"
 description = "Libro notebook editor"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
-    { name = "zhanba", email = "brokun0128@gmail.com" }
+    { name = "brokun", email = "brokun0128@gmail.com" }
 ]
 dependencies = [
     "jupyter-server>=2.13.0",

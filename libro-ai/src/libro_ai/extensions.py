@@ -1,6 +1,5 @@
-from .app import LibroApp
 from .magics import PromptMagic, store_exception
-from IPython import InteractiveShell
+from IPython.core.interactiveshell import InteractiveShell
 
 
 def load_ipython_extension(ipython: InteractiveShell):
@@ -12,15 +11,7 @@ def unload_ipython_extension(ipython: InteractiveShell):
     ipython.set_custom_exc((BaseException,), ipython.CustomTB)
 
 
-def _jupyter_server_extension_points():
-    """
-    Returns a list of dictionaries with metadata describing
-    where to find the `_load_jupyter_server_extension` function.
-    """
-    return [{"module": "libro_server", "app": LibroApp}]
-
-
-def load_jupyter_server_extension(ipython):
+def _load_jupyter_server_extension(ipython):
     """Load the Jupyter server extension.
     Parameters
     ----------

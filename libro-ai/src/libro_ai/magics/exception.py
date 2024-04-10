@@ -1,4 +1,4 @@
-from IPython import InteractiveShell
+from IPython.core.interactiveshell import InteractiveShell
 
 
 def store_exception(shell: InteractiveShell, etype: type, evalue, tb, tb_offset=None):

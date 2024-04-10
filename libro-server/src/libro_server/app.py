@@ -2,7 +2,7 @@ import os
 from glob import glob
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 from traitlets import Unicode
-from jupyterlab_server import LabConfig, add_handlers
+from jupyterlab_server import LabConfig, LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
 from os.path import relpath
 
@@ -11,7 +11,8 @@ from libro_server.handler import LibroLabHandler, LibroWorkspaceHandler
 DEFAULT_STATIC_FILES_PATH = os.path.join(os.path.dirname(__file__), "static")
 DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "templates")
 
-class LibroApp(ExtensionAppJinjaMixin, LabConfig, ExtensionApp):
+
+class LibroApp(LabServerApp):
 
     # -------------- Required traits --------------
     name = "libro"
@@ -50,6 +51,7 @@ class LibroApp(ExtensionAppJinjaMixin, LabConfig, ExtensionApp):
             immutable_cache.update(extensions_url)
 
         self.settings.update({"static_immutable_cache": list(immutable_cache)})
+
     def initialize_templates(self) -> None:
         """Initialize templates."""
         # self.static_paths = [self.static_dir]
@@ -62,6 +64,7 @@ class LibroApp(ExtensionAppJinjaMixin, LabConfig, ExtensionApp):
         self.handlers.append((rf"/{self.name}/?", LibroLabHandler))
         self.handlers.append((rf"/{self.name}/api/workspace", LibroWorkspaceHandler))
         add_handlers(self.handlers, self)
+
 
 # -----------------------------------------------------------------------------
 # Main entry point
