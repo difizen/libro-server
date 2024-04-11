@@ -1,6 +1,6 @@
 [project]
 name = "libro"
-version = "0.1.3"
+version = "0.1.4"
 description = "Libro notebook editor"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
