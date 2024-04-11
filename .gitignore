@@ -331,3 +331,5 @@ objects.inv
 pnpm-lock.yaml
 # mana/**/*
 package-lock.json
+
+**/static/**
