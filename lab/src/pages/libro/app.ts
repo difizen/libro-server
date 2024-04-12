@@ -1,4 +1,10 @@
-import { PageConfig, ServerConnection, ServerManager } from '@difizen/libro-jupyter';
+import {
+  FileCommandContribution,
+  LibroJupyterConfiguration,
+  PageConfig,
+  ServerConnection,
+  ServerManager,
+} from '@difizen/libro-jupyter';
 import { ConfigurationService } from '@difizen/mana-app';
 import { SlotViewManager } from '@difizen/mana-app';
 import { ApplicationContribution, ViewManager } from '@difizen/mana-app';
@@ -11,8 +17,13 @@ export class LibroApp implements ApplicationContribution {
   @inject(ViewManager) viewManager: ViewManager;
   @inject(SlotViewManager) slotViewManager: SlotViewManager;
   @inject(ConfigurationService) configurationService: ConfigurationService;
+  @inject(FileCommandContribution) fileCommandContribution: FileCommandContribution;
 
   async onStart() {
+    this.configurationService.set(LibroJupyterConfiguration.AllowDownload, true);
+    this.configurationService.set(LibroJupyterConfiguration.AllowUpload, true);
+    this.fileCommandContribution.allowUpload = true;
+    this.fileCommandContribution.allowDownload = true;
     let baseUrl = PageConfig.getOption('baseUrl');
     const el = document.getElementById('jupyter-config-data');
     if (el) {
