@@ -38,3 +38,9 @@ libro
 - cd libro-ai
 - rye build
 - rye publish
+
+### libro-flow
+
+- cd libro-flowrye sync
+- rye build
+- rye publish
