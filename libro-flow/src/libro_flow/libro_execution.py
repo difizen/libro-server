@@ -1,3 +1,5 @@
+import json
+from libro_flow.libro_schema_form_widget import SchemaFormWidget
 from numpy import void
 from pydantic import BaseModel
 from nbformat import NotebookNode
@@ -35,9 +37,8 @@ def notebook_args(ArgsModel: type[ArgsType]) -> ArgsType:
     for args_key, args_value in args_model.__dict__.items():
         user_ns[args_key] = args_value
     user_ns["__libro_execute_args__"] = args_model
-    args_metadata = args_model.model_json_schema()
-    data = {"application/vnd.libro.args+json": args_metadata}
-    display(data, raw=True)
+    widget = SchemaFormWidget(dataModel=args_model)
+    display(widget)
     return args_model
 
 

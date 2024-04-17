@@ -1,8 +1,11 @@
 {
     "cSpell.words": [
+        "ipywidgets",
         "nbclient",
         "nbformat",
         "pydantic",
         "traitlets"
-    ]
+    ],
+
+    "typescript.tsdk": "lab/node_modules/typescript/lib"
 }
