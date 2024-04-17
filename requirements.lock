@@ -55,6 +55,7 @@ charset-normalizer==3.3.2
     # via requests
 comm==0.2.2
     # via ipykernel
+    # via ipywidgets
 dataclasses-json==0.6.4
     # via langchain
     # via langchain-community
@@ -86,8 +87,11 @@ ipykernel==6.29.4
     # via libro
 ipython==8.23.0
     # via ipykernel
+    # via ipywidgets
     # via libro
     # via libro-ai
+ipywidgets==8.1.2
+    # via libro-flow
 isoduration==20.11.0
     # via jsonschema
 jedi==0.19.1
@@ -136,6 +140,8 @@ jupyterlab-pygments==0.3.0
     # via nbconvert
 jupyterlab-server==2.25.4
     # via libro
+jupyterlab-widgets==3.0.10
+    # via ipywidgets
 langchain==0.1.14
     # via libro-ai
 langchain-community==0.0.31
@@ -301,6 +307,7 @@ traitlets==5.14.2
     # via comm
     # via ipykernel
     # via ipython
+    # via ipywidgets
     # via jupyter-client
     # via jupyter-core
     # via jupyter-events
@@ -335,5 +342,7 @@ webencodings==0.5.1
     # via tinycss2
 websocket-client==1.7.0
     # via jupyter-server
+widgetsnbextension==4.0.10
+    # via ipywidgets
 yarl==1.9.4
     # via aiohttp

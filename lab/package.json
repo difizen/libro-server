@@ -21,11 +21,16 @@
     "deploy": "copyfiles -u 1 dist/* ../libro-server/src/libro_server/static/ && copyfiles -u 1 dist/**/* ../libro-server/src/libro_server/static/"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.6",
+    "@ant-design/icons": "^5.3.6",
     "@difizen/libro-jupyter": "^0.1.15",
     "@difizen/libro-lab": "^0.1.15",
+    "@difizen/libro-widget": "^0.1.15",
     "@difizen/mana-app": "^0.1.8",
-    "antd": "^5.13.2",
+    "@rjsf/antd": "^5.18.2",
+    "@rjsf/core": "^5.18.2",
+    "@rjsf/validator-ajv8": "^5.18.2",
+    "antd": "^5.16.2",
+    "dayjs": "^1.11.10",
     "umi": "^4.1.1"
   },
   "devDependencies": {

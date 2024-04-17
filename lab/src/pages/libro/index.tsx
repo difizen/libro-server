@@ -5,6 +5,8 @@ import { LibroApp } from './app.js';
 import './index.less';
 import { LibroPromptScript } from './prompt-script.js';
 import { PromptScript } from '@difizen/libro-prompt-cell';
+import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
+import { WidgetModule } from '@difizen/libro-widget';
 
 const BaseModule = ManaModule.create().register(LibroApp, {
   token: PromptScript,
@@ -18,7 +20,13 @@ const App = (): JSX.Element => {
       <ManaComponents.Application
         key="libro"
         asChild={true}
-        modules={[ManaAppPreset, LibroLabModule, BaseModule]}
+        modules={[
+          ManaAppPreset,
+          LibroLabModule,
+          BaseModule,
+          WidgetModule,
+          LibroSchemaFormWidgetModule,
+        ]}
       />
     </div>
   );

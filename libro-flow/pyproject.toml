@@ -11,6 +11,7 @@ dependencies = [
     "nbformat>=5.5.0",
     "nbclient>=0.5.11",
     "jupyter_client>=7.4.8",
+    "ipywidgets>=6.0.0",
     "pydantic>=2.6.4"
 ]
 readme = "README.md"
