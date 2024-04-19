@@ -6,6 +6,5 @@
         "pydantic",
         "traitlets"
     ],
-
     "typescript.tsdk": "lab/node_modules/typescript/lib"
 }
