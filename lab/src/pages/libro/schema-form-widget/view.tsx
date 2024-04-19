@@ -1,21 +1,22 @@
-import React from 'react';
+import React, { Ref, createRef, useRef } from 'react';
 import {
   view,
-  ViewOption,
   transient,
   useInject,
   ViewInstance,
-  inject,
   prop,
+  inject,
+  ViewOption,
 } from '@difizen/mana-app';
 
-import type { IWidgetViewProps } from '@difizen/libro-widget';
+import type { IClassicComm, IWidgetViewProps } from '@difizen/libro-widget';
 import { WidgetView } from '@difizen/libro-widget';
 import { forwardRef, useCallback, useMemo } from 'react';
 import { LibroContextKey } from '@difizen/libro-core';
 import { RJSFSchema, SubmitButtonProps } from '@rjsf/utils';
 import Form from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
+import type { KernelMessage } from '@difizen/libro-kernel';
 import './index.less';
 
 function SubmitButton(props: SubmitButtonProps) {
@@ -25,7 +26,7 @@ function SubmitButton(props: SubmitButtonProps) {
 export const LibroSchemaFormWidgetComponent = forwardRef<HTMLDivElement>(
   (props, ref) => {
     const widgetView = useInject<LibroSchemaFormtWidget>(ViewInstance);
-
+    const formRef = useRef<Form<any, RJSFSchema, any> | null>(null);
     const schema = useMemo(() => {
       try {
         return JSON.parse(widgetView.schema) as RJSFSchema;
@@ -36,7 +37,11 @@ export const LibroSchemaFormWidgetComponent = forwardRef<HTMLDivElement>(
 
     const value = useMemo(() => {
       try {
-        return JSON.parse(widgetView.value);
+        const v = JSON.parse(widgetView.value);
+        if (formRef.current) {
+          formRef.current.setState(v);
+        }
+        return v;
       } catch (e) {
         // console.error(e);
         return {};
@@ -62,11 +67,10 @@ export const LibroSchemaFormWidgetComponent = forwardRef<HTMLDivElement>(
     return (
       <div className="libro-widget-schema-form" ref={ref}>
         <Form
+          ref={formRef}
           schema={schema}
           validator={validator}
           onChange={handleChange}
-          onSubmit={() => console.log('submitted')}
-          onError={() => console.log('errors')}
           templates={{ ButtonTemplates: { SubmitButton } }}
         />
       </div>
@@ -80,6 +84,8 @@ export class LibroSchemaFormtWidget extends WidgetView {
   override view = LibroSchemaFormWidgetComponent;
 
   schema: string;
+  comm: IClassicComm;
+  modelId: string;
 
   @prop() value: string;
 
@@ -90,5 +96,23 @@ export class LibroSchemaFormtWidget extends WidgetView {
     super(props, libroContextKey);
     this.schema = props.attributes.schema;
     this.value = props.attributes.value;
+    this.comm = props.options.comm;
+    this.modelId = props.options.model_id;
+  }
+
+  override handleCommMsg(msg: KernelMessage.ICommMsgMsg): Promise<void> {
+    const data = msg.content.data as any;
+    const method = data.method;
+    switch (method) {
+      case 'update':
+      case 'echo_update':
+        if (data.state.value) {
+          this.value = data.state.value;
+        }
+        if (data.state.schema) {
+          this.schema = data.state.schema;
+        }
+    }
+    return Promise.resolve();
   }
 }

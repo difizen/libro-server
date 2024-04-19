@@ -29,11 +29,11 @@ def notebook_args(ArgsModel: type[ArgsType]) -> ArgsType:
     ipython = get_ipython()
     args_model = ArgsModel()
     user_ns = ipython.user_ns  # type: ignore
-    try:
-        args_dict = user_ns["__libro_execute_args_dict__"]
+
+    args_dict = user_ns.get("__libro_execute_args_dict__")
+    if args_dict is not None:
         args_model = ArgsModel(**args_dict)
-    except (TypeError, KeyError):
-        pass
+
     for args_key, args_value in args_model.__dict__.items():
         user_ns[args_key] = args_value
     user_ns["__libro_execute_args__"] = args_model
@@ -51,9 +51,8 @@ def dump_execution_result(result, path=None):
 
     ipython = get_ipython()
     user_ns = ipython.user_ns  # type: ignore
-    try:
-        result_path = user_ns["__libro_execute_result__"]
-    except KeyError:
+    result_path = user_ns.get("__libro_execute_result__")
+    if result_path is None:
         result_path = path
     if result_path is None:
         result_dir = tempfile.mkdtemp()
