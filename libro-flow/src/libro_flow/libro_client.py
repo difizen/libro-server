@@ -100,11 +100,14 @@ class LibroNotebookClient(NotebookClient):
                 await self.async_execute_cell(
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
-                if cell.metadata.execution is None:
-                    cell.metadata.execution = {}
-                cell.metadata.execution["shell.execute_reply.end"] = (
-                    datetime.datetime.now(datetime.timezone.utc).isoformat()
-                )
+                try:
+                    if cell.metadata.execution is None:
+                        cell.metadata.execution = {}
+                    cell.metadata.execution["shell.execute_reply.end"] = (
+                        datetime.datetime.now(datetime.timezone.utc).isoformat()
+                    )
+                except:
+                    pass
                 if self.execute_record_path is not None:
                     with open(self.execute_record_path, "w", encoding="utf-8") as f:
                         nbformat.write(self.nb, f)
