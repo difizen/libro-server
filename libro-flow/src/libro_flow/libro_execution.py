@@ -38,6 +38,8 @@ def notebook_args(ArgsModel: type[ArgsType]) -> ArgsType:
         user_ns[args_key] = args_value
     user_ns["__libro_execute_args__"] = args_model
     widget = SchemaFormWidget(dataModel=args_model)
+    data = {"application/vnd.libro.args+json": args_model.model_json_schema()}
+    display(data, raw=True)
     display(widget)
     return args_model
 
