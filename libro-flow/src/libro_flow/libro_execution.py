@@ -1,4 +1,6 @@
+import asyncio
 import json
+from nbclient.util import ensure_async, run_sync
 from libro_flow.libro_schema_form_widget import SchemaFormWidget
 from numpy import void
 from pydantic import BaseModel
@@ -91,7 +93,7 @@ def load_notebook_node(notebook_path):
 
 def execute_notebook(
     notebook: Any,
-    parameters=None,
+    args=None,
     execute_result_path: str | None = None,
     execute_record_path: str | None = None,
     notebook_parser: Callable | None = None,
@@ -105,10 +107,12 @@ def execute_notebook(
     client = LibroNotebookClient(
         nb=nb,
         km=km,
-        parameters=parameters,
+        args=args,
         execute_result_path=execute_result_path,
         execute_record_path=execute_record_path,
         **kwargs,
     )
-    client.execute()
+    client.update_execution()
+    asyncio.create_task(client.async_execute())
     display(client.execute_result_path)
+    return client
