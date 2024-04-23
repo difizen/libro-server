@@ -5,3 +5,4 @@ from .libro_execution import (
     execute_notebook,
     inspect_execution_result,
 )
+from .libro_client import LibroNotebookClient

@@ -9,6 +9,8 @@
 /dist
 /libro_
 .swc
+examples/.execution
+examples/execution
 
 # === PYTHON ===
 poetry.lock

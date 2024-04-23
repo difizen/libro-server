@@ -58,9 +58,3 @@ class LibroLabHandler(LabHandler):
             "libro.html", page_config=page_config
         )  # type:ignore[no-untyped-call]
         self.write(tpl)
-
-
-class LibroWorkspaceHandler(APIHandler):
-    async def get(self) -> None:
-        page_config = self.settings.get("page_config_data")
-        self.write(json.dumps(page_config))

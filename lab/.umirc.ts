@@ -5,9 +5,15 @@ export default defineConfig({
   routes: routes,
   runtimePublicPath: {},
   proxy: {
+    '/libro/api': {
+      target: 'http://localhost:8888/',
+      changeOrigin: true,
+      secure: false,
+      pathRewrite: {},
+      ws: true,
+    },
     '/api': {
       target: 'http://localhost:8888/',
-
       changeOrigin: true,
       secure: false,
       pathRewrite: {},

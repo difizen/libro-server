@@ -10,18 +10,35 @@ import {
   useObserve,
   URI,
   ViewRender,
+  timeout,
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 import qs from 'query-string';
-import { Button } from 'antd';
+import { Button, Spin } from 'antd';
 import Form from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
 import { RJSFSchema, SubmitButtonProps } from '@rjsf/utils';
 import { BoxPanel } from '@difizen/mana-react';
 
 import './index.less';
-import { LibroFileService, LibroService, LibroView } from '@difizen/libro-jupyter';
+import {
+  LibroFileService,
+  LibroService,
+  LibroView,
+  ServerConnection,
+} from '@difizen/libro-jupyter';
 import { IChangeEvent } from '@rjsf/core';
+
+interface LibroExecution {
+  id: string;
+  current_index: number;
+  cell_count: number;
+  code_cells_executed: number;
+  start_time: string;
+  end_time: string;
+  execute_result_path: string;
+  execute_record_path: string;
+}
 
 function SubmitButton(props: SubmitButtonProps) {
   return (
@@ -51,7 +68,6 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
         return;
       }
     }
-    instance.schema = undefined;
   }, [libroView?.model.isInitialized]);
 
   const onSub = (data: IChangeEvent<any, RJSFSchema, any>) => {
@@ -66,7 +82,17 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
     <div className="libro-execution-container" ref={ref}>
       <BoxPanel className="libro-execution-container-wrapper" direction="left-to-right">
         <BoxPanel.Pane className="libro-execution-container-left">
-          {instance.resultView && <ViewRender view={instance.resultView}></ViewRender>}
+          {instance.executing && (
+            <Spin
+              spinning={instance.executing}
+              tip={`${instance.currentIndex}/${instance.count}`}
+            >
+              <div style={{ height: 200, width: '100%' }}></div>
+            </Spin>
+          )}
+          {!instance.executing && instance.resultView && (
+            <ViewRender view={instance.resultView}></ViewRender>
+          )}
         </BoxPanel.Pane>
         <BoxPanel.Pane className="libro-execution-container-right" flex={1}>
           <div>
@@ -89,6 +115,7 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
 @singleton()
 @view('libro-execution-view')
 export class LibroExecutionView extends BaseView {
+  @inject(ServerConnection) serverConnection: ServerConnection;
   @inject(LibroFileService) fileService: LibroFileService;
   @inject(LibroService) libroService: LibroService;
   override view = LibroExecutionComponent;
@@ -101,6 +128,18 @@ export class LibroExecutionView extends BaseView {
 
   @prop()
   resultView: LibroView | undefined;
+
+  @prop()
+  executionId: string;
+
+  @prop()
+  executing: boolean = false;
+
+  @prop()
+  count: number = 0;
+
+  @prop()
+  currentIndex: number = 0;
 
   protected _path: string;
   get path(): string {
@@ -136,5 +175,52 @@ export class LibroExecutionView extends BaseView {
     } catch (e) {}
   };
 
-  execute = (args: any) => {};
+  execute = async (args: any) => {
+    this.serverConnection.settings.baseUrl;
+    try {
+      const res = await this.serverConnection.makeRequest(
+        `${this.serverConnection.settings.baseUrl}libro/api/execution`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ args, file: this.path }),
+        },
+      );
+      const result = await res.json();
+      this.executionId = result.id;
+      this.executing = true;
+      if (this.libroView) {
+        this.libroView.dispose();
+      }
+      this.libroView = undefined;
+      this.updateStatus();
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  doUpdateStatus = async () => {
+    const res = await this.serverConnection.makeRequest(
+      `${this.serverConnection.settings.baseUrl}libro/api/execution?id=${this.executionId}`,
+      {
+        method: 'GET',
+      },
+    );
+    const result = (await res.json()) as LibroExecution;
+    this.count = result.cell_count;
+    this.currentIndex = result.current_index;
+    if (result.end_time) {
+      this.executing = false;
+      return true;
+    }
+    return false;
+  };
+
+  updateStatus = async (): Promise<void> => {
+    if (!(await this.doUpdateStatus())) {
+      await timeout(1000);
+      return this.updateStatus();
+    } else {
+      this.updateExecutionResult();
+    }
+  };
 }

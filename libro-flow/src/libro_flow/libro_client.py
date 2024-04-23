@@ -1,10 +1,12 @@
+from uuid import uuid4, UUID
 from nbclient import NotebookClient
 from nbclient.util import ensure_async, run_sync
 import nbformat
 import datetime
 from nbformat import NotebookNode
-from typing import Any
+from typing import Any, Optional
 import json
+from pydantic import BaseModel, Field
 from traitlets import Callable
 
 
@@ -14,7 +16,20 @@ def cellStartExecution(cell, **kwargs):
     ).isoformat()
 
 
+class LibroExecution(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    current_index: int = 0
+    cell_count: int = 0
+    code_cells_executed: int = 0
+    start_time: str = ""
+    end_time: str = ""
+    execute_result_path: str = ""
+    execute_record_path: str = ""
+
+
 class LibroNotebookClient(NotebookClient):
+    execution: LibroExecution = LibroExecution()
+
     def __init__(
         self,
         nb: NotebookNode,
@@ -55,6 +70,13 @@ class LibroNotebookClient(NotebookClient):
         if reply is not None:
             print(reply)
 
+    def get_status(self):
+        status = self.execution
+        return status
+
+    def update_execution(self):
+        self.execution = LibroExecution()
+
     async def async_execute(
         self, reset_kc: bool = False, **kwargs: Any
     ) -> NotebookNode:
@@ -79,6 +101,7 @@ class LibroNotebookClient(NotebookClient):
                     )
             cell_allows_errors = (not self.force_raise_errors) and (self.allow_errors)
             self.start_time = datetime.datetime.now(datetime.timezone.utc)
+            self.execution.start_time = self.start_time.isoformat()
             self.nb.metadata["libro_execute_start_time"] = self.start_time.isoformat()
             await ensure_async(
                 self.kc.execute(
@@ -95,11 +118,16 @@ class LibroNotebookClient(NotebookClient):
                         stop_on_error=not cell_allows_errors,
                     )
                 )
-
+                self.execution.execute_result_path = self.execute_result_path
+            if self.execute_record_path is not None:
+                self.execution.execute_record_path = self.execute_record_path
+            self.execution.cell_count = len(self.nb.cells)
             for index, cell in enumerate(self.nb.cells):
                 await self.async_execute_cell(
                     cell, index, execution_count=self.code_cells_executed + 1
                 )
+                self.execution.current_index = index
+                self.execution.code_cells_executed = self.code_cells_executed
                 try:
                     if cell.metadata.execution is None:
                         cell.metadata.execution = {}
@@ -112,8 +140,10 @@ class LibroNotebookClient(NotebookClient):
                     with open(self.execute_record_path, "w", encoding="utf-8") as f:
                         nbformat.write(self.nb, f)
             self.set_widgets_metadata()
+            self.kc.shutdown()
             # await self.inspect_execution_result()
             self.end_time = datetime.datetime.now(datetime.timezone.utc)
+            self.execution.end_time = self.end_time.isoformat()
             self.nb.metadata["libro_execute_end_time"] = self.end_time.isoformat()
             log = None
         return self.nb
