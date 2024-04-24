@@ -1,6 +1,6 @@
 [project]
 name = "libro"
-version = "0.1.5"
+version = "0.1.6"
 description = "Libro notebook editor"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
@@ -10,7 +10,7 @@ dependencies = [
     "jupyter-server>=2.13.0",
     "jupyterlab-server>=2.25.4",
     "ipykernel>=6.29.4",
-    "ipython>=8.23.0",
+    "ipython>=7.34.0",
     "jupyter-lsp>=2.2.4",
     "ruff-lsp>=0.0.53",
 ]
