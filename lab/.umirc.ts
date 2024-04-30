@@ -34,7 +34,7 @@ export default defineConfig({
     ['@babel/plugin-transform-class-properties', { loose: true }],
     'babel-plugin-parameter-decorator',
   ],
-  plugins: ['./dumi-plugin-nodenext'],
+  plugins: ['./dumi-plugin-nodenext', './umi-plugin-router'],
   mfsu: false,
   jsMinifier: 'none',
 });

@@ -1,4 +1,4 @@
-import React, { Ref, createRef, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   view,
   transient,
@@ -9,7 +9,7 @@ import {
   ViewOption,
 } from '@difizen/mana-app';
 
-import type { IClassicComm, IWidgetViewProps } from '@difizen/libro-widget';
+import type { IWidgetViewProps } from '@difizen/libro-widget';
 import { WidgetView } from '@difizen/libro-widget';
 import { forwardRef, useCallback, useMemo } from 'react';
 import { LibroContextKey } from '@difizen/libro-core';
@@ -84,8 +84,6 @@ export class LibroSchemaFormtWidget extends WidgetView {
   override view = LibroSchemaFormWidgetComponent;
 
   schema: string;
-  comm: IClassicComm;
-  modelId: string;
 
   @prop() value: string;
 
@@ -96,8 +94,6 @@ export class LibroSchemaFormtWidget extends WidgetView {
     super(props, libroContextKey);
     this.schema = props.attributes.schema;
     this.value = props.attributes.value;
-    this.comm = props.options.comm;
-    this.modelId = props.options.model_id;
   }
 
   override handleCommMsg(msg: KernelMessage.ICommMsgMsg): Promise<void> {
