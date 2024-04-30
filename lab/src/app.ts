@@ -6,10 +6,18 @@ function initPublicPath() {
   window.publicPath = cdn;
   // @ts-ignore
   if (__webpack_require__) {
-  // @ts-ignore
+    // @ts-ignore
     __webpack_require__.p = cdn;
+  }
+
+  const el = document.getElementById('jupyter-config-data');
+  if (el) {
+    const pageConfig = JSON.parse(el.textContent || '') as Record<string, string>;
+    const baseUrl = pageConfig['baseUrl'];
+    if (baseUrl && baseUrl.startsWith('/')) {
+      window.routerBase = baseUrl;
+    }
   }
 }
 
 initPublicPath();
-
