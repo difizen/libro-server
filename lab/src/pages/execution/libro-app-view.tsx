@@ -1,11 +1,10 @@
 import type { NotebookOption } from '@difizen/libro-core';
-import { VirtualizedManagerHelper } from '@difizen/libro-core';
-import { CollapseServiceFactory, NotebookService } from '@difizen/libro-core';
-import { LibroView, notebookViewFactoryId } from '@difizen/libro-core';
+import { LibroView } from '@difizen/libro-core';
 import {
+  BaseView,
   getOrigin,
+  prop,
   URI,
-  useConfigurationValue,
   useInject,
   useObserve,
   view,
@@ -16,29 +15,16 @@ import { inject, transient } from '@difizen/mana-app';
 
 import {
   CellView,
-  CustomDragLayer,
   DndContentProps,
-  DndContext,
-  DndList,
   ExecutableCellView,
-  LibroJupyterView,
+  LibroService,
 } from '@difizen/libro-jupyter';
-import {
-  FC,
-  ReactNode,
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FC, ReactNode, forwardRef, memo, useCallback, useRef } from 'react';
 import { BackTop, Button } from 'antd';
 import { ToTopOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
-import React from 'react';
-import { AppCellContainer } from './default-dnd-content';
-import { DndCellItemRender } from './dnd-cell-item-render';
+import { AppCellContainer } from './default-dnd-content.js';
+import { DndCellItemRender } from './dnd-cell-item-render.js';
 
 export const DndCellRender: FC<DndContentProps> = memo(function DndCellRender({
   cell,
@@ -46,9 +32,13 @@ export const DndCellRender: FC<DndContentProps> = memo(function DndCellRender({
   ...props
 }: DndContentProps) {
   const observableCell = useObserve(cell);
-  const instance = useInject<LibroView>(ViewInstance);
-  const DndCellContainer = instance.dndContentRender;
+  const appInstance = useInject<LibroAppView>(ViewInstance);
+  const instance = appInstance.libroView;
+  if (!instance) {
+    return null;
+  }
 
+  const DndCellContainer = appInstance.dndContentRender;
   return (
     <DndCellContainer cell={observableCell} key={cell.id} index={index} {...props} />
   );
@@ -62,8 +52,6 @@ export const DndCellsRender = forwardRef<
   ref,
 ) {
   const LoadingRender = getOrigin(libroView.loadingRender);
-  const virtualizedManagerHelper = useInject(VirtualizedManagerHelper);
-  const virtualizedManager = virtualizedManagerHelper.getOrCreate(libroView.model);
 
   const cells = libroView.model.getCells().reduce<CellView[]>(function (a, b) {
     if (a.indexOf(b) < 0) {
@@ -72,46 +60,9 @@ export const DndCellsRender = forwardRef<
     return a;
   }, []);
 
-  const [isVirtualList, setIsVirtualList] = useState<boolean>(false);
-  const [isJudging, setIsJudging] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (!libroView.model.isInitialized) {
-      return;
-    }
-
-    let size = undefined;
-    let path = undefined;
-
-    // TODO: 类型处理
-    const model = libroView.model as any;
-    if (model.currentFileContents && model.currentFileContents.size) {
-      size = parseFloat((model.currentFileContents.size / 1048576).toFixed(3)); // 单位MB
-      path = model.currentFileContents.path || '';
-    }
-
-    setIsJudging(true);
-    virtualizedManager
-      .openVirtualized(cells.length, size, path)
-      .then((willOpen) => {
-        setIsVirtualList(willOpen);
-        return;
-      })
-      .catch(() => {
-        setIsVirtualList(false);
-      })
-      .finally(() => {
-        setIsJudging(false);
-      })
-      .catch((e) => {
-        //
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [virtualizedManager, libroView.model.isInitialized]);
-
   const isInitialized = libroView.model.isInitialized;
-  const isLoading = !isInitialized || isJudging;
-  const shouldRenderCells = isInitialized && !isJudging;
+  const isLoading = !isInitialized;
+  const shouldRenderCells = isInitialized;
 
   return (
     <>
@@ -137,9 +88,13 @@ export const LibroAppComponent = memo(function LibroAppComponent() {
   const libroViewRightContentRef = useRef<HTMLDivElement>(null);
   const libroViewLeftContentRef = useRef<HTMLDivElement>(null);
   const libroViewContentRef = useRef<HTMLDivElement>(null);
-  const instance = useInject<LibroView>(ViewInstance);
+  const appInstance = useInject<LibroAppView>(ViewInstance);
+  const instance = appInstance.libroView;
 
   const handleScroll = useCallback(() => {
+    if (!instance) {
+      return;
+    }
     instance.cellScrollEmitter.fire();
     const cellRightToolbar = instance.container?.current?.getElementsByClassName(
       'libro-cell-right-toolbar',
@@ -178,6 +133,10 @@ export const LibroAppComponent = memo(function LibroAppComponent() {
     }
   }, [instance]);
 
+  if (!instance) {
+    return null;
+  }
+
   return (
     <div
       className="libro-view-content"
@@ -186,10 +145,7 @@ export const LibroAppComponent = memo(function LibroAppComponent() {
     >
       <div className="libro-view-content-left" ref={libroViewLeftContentRef}>
         <div className="libro-dnd-list-container">
-          <DndContext>
-            <CustomDragLayer />
-            <DndCellsRender libroView={instance} addCellButtons={null} />
-          </DndContext>
+          <DndCellsRender libroView={instance} addCellButtons={null} />
         </div>
       </div>
       <div className="libro-view-content-right" ref={libroViewRightContentRef}></div>
@@ -203,24 +159,27 @@ export const LibroAppComponent = memo(function LibroAppComponent() {
 });
 
 @transient()
-@view(notebookViewFactoryId)
-export class LibroAppView extends LibroJupyterView {
+@view('libro-app')
+export class LibroAppView extends BaseView {
+  protected libroService: LibroService;
   override view = LibroAppComponent;
   dndContentRender: FC<DndContentProps> = AppCellContainer;
-  dndItemRender: React.MemoExoticComponent<
-    ForwardRefExoticComponent<DndItemProps & RefAttributes<HTMLDivElement>>
-  > = DndCellItemRender;
-  uri: URI;
+  dndItemRender = DndCellItemRender;
+  declare uri: URI;
+
+  @prop() libroView?: LibroView;
+
   constructor(
     @inject(ViewOption) options: NotebookOption,
-    @inject(CollapseServiceFactory) collapseServiceFactory: CollapseServiceFactory,
-    @inject(NotebookService) notebookService: NotebookService,
-    @inject(VirtualizedManagerHelper)
-    virtualizedManagerHelper: VirtualizedManagerHelper,
+    @inject(LibroService) libroService: LibroService,
   ) {
-    super(options, collapseServiceFactory, notebookService, virtualizedManagerHelper);
+    super();
+    this.libroService = libroService;
+    this.libroService.getOrCreateView(options).then((view) => {
+      this.libroView = view;
+    });
   }
   get options() {
-    return this.model.options;
+    return this.libroView?.model.options;
   }
 }
