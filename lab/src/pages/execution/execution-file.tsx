@@ -6,7 +6,7 @@ import {
   useInject,
   view,
 } from '@difizen/mana-app';
-import { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import qs from 'query-string';
 
 export const LibroExecutionFileComponent = forwardRef<HTMLDivElement>(
@@ -35,8 +35,7 @@ export const LibroExecutionFileComponent = forwardRef<HTMLDivElement>(
 export class LibroExecutionFileView extends BaseView {
   override view = LibroExecutionFileComponent;
 
-  @prop()
-  protected _path: string;
+  @prop() protected _path: string;
 
   get path(): string {
     return this._path;

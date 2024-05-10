@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   view,
   singleton,
@@ -11,23 +11,20 @@ import {
   URI,
   ViewRender,
   timeout,
+  ViewManager,
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 import qs from 'query-string';
 import { Button, Spin } from 'antd';
-import Form from '@rjsf/antd';
+import { Form } from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
 import { RJSFSchema, SubmitButtonProps } from '@rjsf/utils';
 import { BoxPanel } from '@difizen/mana-react';
 
 import './index.less';
-import {
-  LibroFileService,
-  LibroService,
-  LibroView,
-  ServerConnection,
-} from '@difizen/libro-jupyter';
-import { IChangeEvent } from '@rjsf/core';
+import { LibroFileService, ServerConnection } from '@difizen/libro-jupyter';
+import type { IChangeEvent } from '@rjsf/core';
+import { LibroAppView } from './libro-app-view.js';
 
 interface LibroExecution {
   id: string;
@@ -49,11 +46,11 @@ function SubmitButton(props: SubmitButtonProps) {
 }
 
 export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) => {
-  const formRef = useRef<Form<any, RJSFSchema, any> | null>(null);
+  const formRef = useRef<any | null>(null);
   const instance = useInject<LibroExecutionView>(ViewInstance);
   const queryParams = qs.parse(window.location.search);
   const filePath = queryParams['path'];
-  const libroView = useObserve(instance.libroView);
+  const appView = useObserve(instance.libroView);
   useEffect(() => {
     if (filePath && typeof filePath === 'string') {
       instance.path = filePath;
@@ -61,14 +58,14 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
   }, [filePath]);
 
   useEffect(() => {
-    if (libroView?.model.metadata) {
-      const metadata = libroView?.model.metadata;
+    if (appView?.libroView?.model.metadata) {
+      const metadata = appView.libroView?.model.metadata;
       if (metadata && metadata['args']) {
         instance.schema = metadata['args'];
         return;
       }
     }
-  }, [libroView?.model.isInitialized]);
+  }, [appView?.libroView?.model.isInitialized]);
 
   const onSub = (data: IChangeEvent<any, RJSFSchema, any>) => {
     const formData = data.formData;
@@ -100,7 +97,7 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
               <Form
                 ref={formRef}
                 schema={instance.schema}
-                validator={validator}
+                validator={validator as any}
                 onSubmit={onSub}
                 templates={{ ButtonTemplates: { SubmitButton } }}
               />
@@ -117,17 +114,17 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
 export class LibroExecutionView extends BaseView {
   @inject(ServerConnection) serverConnection: ServerConnection;
   @inject(LibroFileService) fileService: LibroFileService;
-  @inject(LibroService) libroService: LibroService;
+  @inject(ViewManager) viewManager: ViewManager;
   override view = LibroExecutionComponent;
 
   @prop()
-  libroView: LibroView | undefined;
+  libroView: LibroAppView | undefined;
 
   @prop()
   schema: any;
 
   @prop()
-  resultView: LibroView | undefined;
+  resultView: LibroAppView | undefined;
 
   @prop()
   executionId: string;
@@ -154,7 +151,7 @@ export class LibroExecutionView extends BaseView {
     this.schema = undefined;
     if (!this.path) return;
     document.title = `execution: ${this.path}`;
-    this.libroView = await this.libroService.getOrCreateView({
+    this.libroView = await this.viewManager.getOrCreateView(LibroAppView, {
       resource: this.path,
     });
     this.updateExecutionResult();
@@ -168,7 +165,7 @@ export class LibroExecutionView extends BaseView {
       const resultPath = resultUri.path.toString();
       const tryRead = await this.fileService.read(resultPath);
       if (tryRead) {
-        this.resultView = await this.libroService.getOrCreateView({
+        this.resultView = await this.viewManager.getOrCreateView(LibroAppView, {
           resource: resultPath,
         });
       }

@@ -20,10 +20,10 @@ import {
   DndItemProps,
   ExecutableCellModel,
   ExecutableCellView,
-  LibroView,
   hasErrorOutput,
   isCellView,
 } from '@difizen/libro-jupyter';
+import { LibroAppView } from './libro-app-view.js';
 
 const CellInputContent = memo(function CellInputContent(props: { cell: CellView }) {
   const { cell } = props;
@@ -202,8 +202,8 @@ const DndCellItemRenderInner = forwardRef(function DndCellItemRender(
 ) {
   const { cell } = props;
   const observableCell = useObserve(cell);
-  const instance = useInject<LibroView>(ViewInstance);
-  const isActive = instance.activeCell?.id === observableCell.id;
+  const appInstance = useInject<LibroAppView>(ViewInstance);
+  const instance = appInstance.libroView;
   const hasErrorOutputs = hasErrorOutput(observableCell);
   const hasCellHidden = useMemo(() => {
     return observableCell.hasCellHidden();
@@ -211,8 +211,8 @@ const DndCellItemRenderInner = forwardRef(function DndCellItemRender(
 
   const classNames = [
     'libro-dnd-cell',
-    { 'command-mode': instance.model.commandMode },
-    { 'edit-mode': !instance.model.commandMode },
+    { 'command-mode': instance?.model.commandMode },
+    { 'edit-mode': !instance?.model.commandMode },
     { error: hasErrorOutputs },
     {
       hidden: hasCellHidden,
