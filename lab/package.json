@@ -22,9 +22,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
-    "@difizen/libro-jupyter": "^0.1.15",
-    "@difizen/libro-lab": "^0.1.15",
-    "@difizen/libro-widget": "^0.1.15",
+    "@difizen/libro-jupyter": "^0.1.34",
+    "@difizen/libro-lab": "^0.1.34",
     "@difizen/mana-app": "^0.1.8",
     "@rjsf/antd": "^5.18.2",
     "@rjsf/core": "^5.18.2",

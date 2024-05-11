@@ -1,5 +1,13 @@
 export default [
   {
+    path: '/lab/interaction',
+    component: 'interaction',
+  },
+  {
+    path: '/libro/interaction',
+    component: 'interaction',
+  },
+  {
     path: '/lab/execution',
     component: 'execution',
   },

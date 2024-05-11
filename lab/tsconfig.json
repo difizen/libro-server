@@ -37,5 +37,6 @@
 
     /* dev */
     "preserveWatchOutput": true
-  }
+  },
+  "exclude": []
 }
