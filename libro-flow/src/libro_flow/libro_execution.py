@@ -116,3 +116,30 @@ def execute_notebook(
     asyncio.create_task(client.async_execute())
     display(client.execute_result_path)
     return client
+
+
+def execute_notebook_sync(
+    notebook: Any,
+    args=None,
+    execute_result_path: str | None = None,
+    execute_record_path: str | None = None,
+    notebook_parser: Callable | None = None,
+    km: Union[KernelManager, None] = None,
+    **kwargs: Any,
+):
+    if notebook_parser is not None:
+        nb = notebook_parser(notebook)
+    else:
+        nb = load_notebook_node(notebook)
+    client = LibroNotebookClient(
+        nb=nb,
+        km=km,
+        args=args,
+        execute_result_path=execute_result_path,
+        execute_record_path=execute_record_path,
+        **kwargs,
+    )
+    client.update_execution()
+    client.execute()
+    display(client.execute_result_path)
+    return client
