@@ -9,8 +9,8 @@ import {
   ViewOption,
 } from '@difizen/mana-app';
 
-import type { IWidgetViewProps } from '@difizen/libro-widget';
-import { WidgetView } from '@difizen/libro-widget';
+import type { IWidgetViewProps } from '@difizen/libro-jupyter';
+import { WidgetView } from '@difizen/libro-jupyter';
 import { forwardRef, useCallback, useMemo } from 'react';
 import { LibroContextKey } from '@difizen/libro-core';
 import { RJSFSchema, SubmitButtonProps } from '@rjsf/utils';

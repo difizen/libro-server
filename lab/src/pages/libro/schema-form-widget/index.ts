@@ -1,5 +1,5 @@
 import { ManaModule } from '@difizen/mana-app';
-import { WidgetModule } from '@difizen/libro-widget';
+import { WidgetModule } from '@difizen/libro-jupyter';
 import { SchemaFormModelContribution } from './contribution.js';
 import { LibroSchemaFormtWidget } from './view.js';
 
