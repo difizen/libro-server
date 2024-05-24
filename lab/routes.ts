@@ -28,4 +28,8 @@ export default [
     component: 'libro',
     routes: [],
   },
+  {
+    path: '/hackthon',
+    component: 'hackthon',
+  },
 ];

@@ -6,6 +6,7 @@ import './index.less';
 import { LibroPromptScript } from './prompt-script.js';
 import { PromptScript } from '@difizen/libro-prompt-cell';
 import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
+import { LibroHackthonModule } from '../../modules/libro-hackthon-module.js';
 
 const BaseModule = ManaModule.create().register(LibroApp, {
   token: PromptScript,
@@ -24,6 +25,7 @@ const App = (): JSX.Element => {
           LibroLabModule,
           BaseModule,
           LibroSchemaFormWidgetModule,
+          LibroHackthonModule
         ]}
       />
     </div>
