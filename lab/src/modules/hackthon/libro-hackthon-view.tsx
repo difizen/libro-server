@@ -15,9 +15,9 @@ import { inject, transient } from '@difizen/mana-app';
 import {
   ExecutableCellView,
   LibroService,
+  ServerConnection,
 } from '@difizen/libro-jupyter';
 import { memo, useRef } from 'react';
-
 
 export const LibroHackthonComponent = memo(function LibroAppComponent() {
   const libroViewContentRef = useRef<HTMLDivElement>(null);
@@ -27,16 +27,18 @@ export const LibroHackthonComponent = memo(function LibroAppComponent() {
     <div
       className="libro-view-content"
       ref={libroViewContentRef}
-    >{
-        instance.libroView?.model.cells.map(cell => {
-            if(!cell.model.metadata['renderCellOutput']) return null;
-            if(ExecutableCellView.is(cell) ){
-                return <ViewRender view={cell.outputArea}></ViewRender>
-            }else{
-                return <ViewRender view={cell}></ViewRender>
-            }
-        })
-    }
+    >
+        {
+            instance.libroView?.model.cells.map(cell => {
+                if(!cell.model.metadata['renderCellOutput']) return null;
+                if(ExecutableCellView.is(cell) ){
+                    return <ViewRender view={cell.outputArea}></ViewRender>
+                }else{
+                    return <ViewRender view={cell}></ViewRender>
+                }
+            })
+        }
+    
     </div>
   );
 });
@@ -48,6 +50,8 @@ export class LibroHackthonView extends BaseView {
   override view = LibroHackthonComponent;
   declare uri: URI;
 
+  @inject(ServerConnection) serverConnection: ServerConnection;
+
   @prop() libroView?: LibroView;
 
   @prop() executeMessage?: string;
@@ -57,6 +61,9 @@ export class LibroHackthonView extends BaseView {
   @prop() executed: number;
 
   @prop() succeed?: boolean = undefined;
+
+  @prop()
+  runId: string;
 
   constructor(
     @inject(ViewOption) options: NotebookOption,
@@ -71,5 +78,4 @@ export class LibroHackthonView extends BaseView {
   get options() {
     return this.libroView?.model.options;
   }
-
 }

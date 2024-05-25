@@ -1,6 +1,7 @@
 import os
 from glob import glob
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
+from libro_server.hackthon.chat_handler import LibroChatHandler
 from traitlets import Unicode
 from jupyterlab_server import LabConfig, LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
@@ -68,6 +69,7 @@ class LibroApp(LabServerApp):
             [
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
                 (rf"/{self.name}/api/execution", LibroExecutionHandler),
+                (rf"/{self.name}/api/chat", LibroChatHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
                 (rf"/{self.name}/interaction", LibroLabHandler),
                 (rf"/{self.name}/?", LibroLabHandler),
