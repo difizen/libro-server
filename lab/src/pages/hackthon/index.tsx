@@ -1,7 +1,7 @@
 import { ManaAppPreset, ManaComponents, ManaModule, RootSlotId, createSlotPreference } from "@difizen/mana-app";
-import { DemoHackthonView } from "../../modules/demo-view.js";
 import { LibroJupyterModule } from "@difizen/libro-jupyter";
-import { LibroHackthonModule } from "../../modules/libro-hackthon-module.js";
+import { DemoHackthonView } from "../../modules/hackthon/demo-view.js";
+import { LibroHackthonModule } from "../../modules/hackthon/libro-hackthon-module.js";
 
 const BaseModule = ManaModule.create().register(
     DemoHackthonView,
