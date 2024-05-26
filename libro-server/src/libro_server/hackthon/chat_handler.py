@@ -2,6 +2,7 @@ import json
 import os
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.auth.decorator import authorized, allow_unauthenticated
+from libro_server.hackthon.agent import MyCustomHandler,agent
 from tornado.web import HTTPError, authenticated
 from libro_flow import execute_notebook, LibroNotebookClient
 from jupyter_server.utils import ApiPath, to_os_path, to_api_path
@@ -10,7 +11,8 @@ from contextlib import contextmanager
 import errno
 from traitlets import Unicode
 import uuid
-from libro_server.hackthon_globals import run_id_to_notebooks
+from libro_server.hackthon_globals import NotebooksInfo, run_id_to_notebooks
+from langchain_core.runnables.config import RunnableConfig    
 
 class LibroChatHandler(APIHandler):
     executors: dict[str, LibroNotebookClient] = {}
@@ -98,22 +100,19 @@ class LibroChatHandler(APIHandler):
         input = model.get("input")
         print(input)
         args = model.get("args")
+
+        run_id = uuid.uuid4()
+        print(run_id)
+        callback = MyCustomHandler(post_method=self.finish)
+        runconfig = RunnableConfig(
+            callbacks=[callback]
+        )
         run_id = str(uuid.uuid4())
         if input is None:
             raise HTTPError(400, "input is missing")
         if not isinstance(input, str):
             raise HTTPError(400, "input is invalid")
-        result = {"status":200, "runId": 'run_123'}
-        print(result)
-        self.finish(json.dumps(result))
-        # file_full_path = self._get_os_path(file)
-        # result_path = self.result_path(file)
-        # client = execute_notebook(
-        #     notebook=file_full_path, args=args, execute_record_path=result_path
-        # )
-        # self.executors[file_full_path] = client
-        # self.executors[str(client.execution.id)] = client
-        # self.write(json.dumps({"file": file, "id": str(client.execution.id)}))
+        agent.invoke({"input": input}, runconfig)
 
     @authenticated
     @allow_unauthenticated
@@ -123,9 +122,23 @@ class LibroChatHandler(APIHandler):
             run_id = "".join(map(bytes.decode, run_id))
         res = None
         if isinstance(run_id, str):
-            res = run_id_to_notebooks.get(run_id)
-            if res is None:
-                raise HTTPError(400, "this run_id cant find notebook")
+            notebooks_res:NotebooksInfo = run_id_to_notebooks.get(run_id)
+            print('notebooks_res',notebooks_res)
+            if notebooks_res is None:
+                raise HTTPError(400, "run_id is invalid")
+            notebooks_clients= notebooks_res.get("render_notebooks").stack
+            if notebooks_clients is None:
+                raise HTTPError(400, "notebooks_clients is None")
+            notebooks = []
+            for client in notebooks_clients:
+                notebooks.append(client.get_status().model_dump_json())
+            res = {
+                "id":run_id,
+                "status":notebooks_res.get("status"),
+                "notebooks":notebooks
+            }
         else:
             raise HTTPError(400, "run_id is invalid")
+        if res is None:
+            raise HTTPError(400, "this run_id cant find notebook")
         self.write(json.dumps(res))

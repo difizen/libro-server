@@ -14,17 +14,20 @@ import { ServerConnection } from '@difizen/libro-jupyter';
 import { memo, useRef } from 'react';
 import { Button } from 'antd';
 
-interface IRenderNotebook {
-    file_path:string;
-    last_modified:string
+interface LibroExecution {
+  id: string;
+  current_index: number;
+  cell_count: number;
+  code_cells_executed: number;
+  start_time: string;
+  end_time: string;
+  execute_result_path: string;
+  execute_record_path: string;
 }
 interface LibroChat {
     id: string;
-    current_notebook_path: string;
     status:'loading'|'success'|'fail'
-    start_time: string;
-    end_time: string;
-    render_notebooks:IRenderNotebook[];
+    render_notebooks:LibroExecution[];
 }
 
 export const LibroHackthonComponent = memo(function LibroAppComponent() {
@@ -37,7 +40,7 @@ export const LibroHackthonComponent = memo(function LibroAppComponent() {
       ref={libroViewContentRef}
     >
         <Button onClick={()=>{
-            instance.postChat('LibroHackthonChatbotView');
+            instance.postChat('请问玄学是什么？');
         }}></Button>    
     </div>
   );
@@ -89,8 +92,8 @@ export class LibroHackthonChatbotView extends BaseView {
       },
     );
     const result = (await res.json()) as LibroChat;
-    this.curNotebook = result.current_notebook_path;
-    if (result.end_time) {
+    console.log("🚀 ~ LibroHackthonChatbotView ~ doUpdateStatus= ~ result:", result)
+    if (result.status==="success") {
       this.executing = false;
       return true;
     }
@@ -100,9 +103,9 @@ export class LibroHackthonChatbotView extends BaseView {
   updateStatus = async (runId:string): Promise<void> => {
     if (!(await this.doUpdateStatus(runId))) {
       await timeout(1000);
-    //   return this.updateStatus(runId);
+      return this.updateStatus(runId);
     } else {
-    //   this.updateExecutionResult();
+      // this.updateExecutionResult();
     }
   };
 }
