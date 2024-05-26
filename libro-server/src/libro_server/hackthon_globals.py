@@ -4,6 +4,8 @@ from libro_flow.libro_client import LibroNotebookClient
 
 run_id_to_notebooks = {}
 
+run_id_to_agent_task = {}
+
 tool_id_to_run_id = {}
 
 # class Notebook:

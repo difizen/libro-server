@@ -11,8 +11,9 @@ from contextlib import contextmanager
 import errno
 from traitlets import Unicode
 import uuid
-from libro_server.hackthon_globals import NotebooksInfo, run_id_to_notebooks
-from langchain_core.runnables.config import RunnableConfig    
+from libro_server.hackthon_globals import NotebooksInfo, run_id_to_notebooks,run_id_to_agent_task
+from langchain_core.runnables.config import RunnableConfig
+import asyncio
 
 class LibroChatHandler(APIHandler):
     executors: dict[str, LibroNotebookClient] = {}
@@ -112,7 +113,9 @@ class LibroChatHandler(APIHandler):
             raise HTTPError(400, "input is missing")
         if not isinstance(input, str):
             raise HTTPError(400, "input is invalid")
-        agent.invoke({"input": input}, runconfig)
+        task = asyncio.create_task(agent.invoke({"input": input}, runconfig))
+        print("task",task)
+        run_id_to_agent_task[run_id] = task
 
     @authenticated
     @allow_unauthenticated
@@ -130,8 +133,10 @@ class LibroChatHandler(APIHandler):
             if notebooks_clients is None:
                 raise HTTPError(400, "notebooks_clients is None")
             notebooks = []
+            print("chat get before")
             for client in notebooks_clients:
                 notebooks.append(client.get_status().model_dump_json())
+                print("chat get after")
             res = {
                 "id":run_id,
                 "status":notebooks_res.get("status"),
