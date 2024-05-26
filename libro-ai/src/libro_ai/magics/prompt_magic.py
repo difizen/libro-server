@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from email import message
 from IPython.core.magic import Magics, magics_class, line_cell_magic
 
 from ..chat import chat_object_manager, chat_record_provider
 from langchain.prompts import PromptTemplate
-from langchain_core.messages import BaseMessage, AIMessage
+from langchain_core.messages import BaseMessage, AIMessage, HumanMessage
+from typing import List, Dict, Any
 
 
 def preprocessing_line_prompt(line, local_ns):
@@ -83,6 +85,7 @@ class PromptMagic(Magics):
         if chat_key is None or chat_key == "":
             chat_key = args.get("model_name")
         prompt: str = args.get("prompt")
+        filename: str = args.get("filename")
         cell_id: str = args.get("cell_id")
 
         if (
@@ -94,7 +97,9 @@ class PromptMagic(Magics):
 
         record_id: str = args.get("record")
         variable_name: str = args.get("variable_name")
+
         dict = chat_object_manager.get_object_dict()
+
         if chat_key in dict:
             object = dict.get(chat_key)
             if object:
@@ -102,20 +107,37 @@ class PromptMagic(Magics):
                 # Use langchain prompt to support prompt templates and other features
                 template = PromptTemplate.from_template(prompt)
                 formattedPrompt = template.invoke(local_ns)
-
+                messages = formattedPrompt.to_messages()
+                if filename:
+                    url = "https://nl2quant.oss-cn-beijing.aliyuncs.com/" + filename
+                    msg = messages[len(messages) - 1]
+                    if isinstance(msg.content, str):
+                        text = msg.content
+                        content: Any = [
+                            {"type": "text", "text": text},
+                        ]
+                        lower_name = filename.lower()
+                        if lower_name.endswith(".pdf"):
+                            content.append({"type": "pdf_url", "pdf_url": url})
+                        if (
+                            lower_name.endswith(".jpg")
+                            or lower_name.endswith(".png")
+                            or lower_name.endswith(".jpeg")
+                        ):
+                            content.append({"type": "image_url", "image_url": url})
+                        new_msg = HumanMessage(content=content)
+                        messages[len(messages) - 1] = new_msg
                 res = None
                 if cell_id and record_id:
                     record = chat_record_provider.get_record(record_id)
-                    record.append_messages(
-                        cell_id, formattedPrompt.to_messages(), reset=True
-                    )
+                    record.append_messages(cell_id, messages, reset=True)
                     res = executor.run(record.get_messages())
                     if res and isinstance(res, BaseMessage):
                         record.append_message(cell_id, res)
                     if res and isinstance(res, str):
                         record.append_message(cell_id, AIMessage(content=res))
                 else:
-                    res = executor.run(formattedPrompt)
+                    res = executor.run(messages)
                 executor.display(res)
                 # Set variable
                 try:

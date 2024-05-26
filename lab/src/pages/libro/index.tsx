@@ -1,17 +1,22 @@
 import { LibroLabModule } from '@difizen/libro-lab';
-import { ManaAppPreset, ManaComponents, ManaModule, Syringe } from '@difizen/mana-app';
+import { ManaAppPreset, ManaComponents, ManaModule } from '@difizen/mana-app';
 
 import { LibroApp } from './app.js';
 import './index.less';
-import { LibroPromptScript } from './prompt-script.js';
-import { PromptScript } from '@difizen/libro-prompt-cell';
 import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
+import { FinPromptCellModule } from './prompt-cell/index.js';
+import { LibroBetweenCellModule } from '@difizen/libro-jupyter';
+import { ProgressWidget, ProgressWidgetViewContribution } from './progress/index.js';
+import { LibroWidgetMimeContribution } from './widget-rendermime-contribution.js';
 
-const BaseModule = ManaModule.create().register(LibroApp, {
-  token: PromptScript,
-  useClass: LibroPromptScript,
-  lifecycle: Syringe.Lifecycle.singleton,
-});
+const BaseModule = ManaModule.create()
+  .register(
+    LibroApp,
+    ProgressWidgetViewContribution,
+    ProgressWidget,
+    LibroWidgetMimeContribution,
+  )
+  .dependOn(FinPromptCellModule, LibroLabModule);
 
 const App = (): JSX.Element => {
   return (
@@ -24,6 +29,7 @@ const App = (): JSX.Element => {
           LibroLabModule,
           BaseModule,
           LibroSchemaFormWidgetModule,
+          LibroBetweenCellModule,
         ]}
       />
     </div>
