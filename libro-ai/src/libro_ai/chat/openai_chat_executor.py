@@ -7,6 +7,7 @@ from langchain_core.messages import AIMessage
 from langchain.callbacks import get_openai_callback
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from IPython.display import display
+from typing import List
 
 
 class OpenAIChat(LLMChat):
@@ -66,7 +67,10 @@ class DalleChat(LLMChat):
             if not self.dalle:
                 raise Exception("Chat model not loaded")
             dalle = self.dalle
-            result = dalle.run(value.text)
+            text = value
+            if isinstance(value, List):
+                text = value[0].content
+            result = dalle.run(text)
             return result
         except Exception as e:
             return ""

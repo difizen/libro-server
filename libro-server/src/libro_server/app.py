@@ -1,5 +1,7 @@
 import os
 from glob import glob
+from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
+from libro_server.upload_handler import UploadHandler
 from traitlets import Unicode
 from jupyterlab_server import LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
@@ -9,14 +11,16 @@ from .static_handler import LibroLabHandler
 from .workspace_handler import LibroWorkspaceHandler
 
 DEFAULT_STATIC_FILES_PATH = os.path.join(os.path.dirname(__file__), "static")
-DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "templates")
+DEFAULT_TEMPLATE_FILES_PATH = os.path.join(
+    os.path.dirname(__file__), "templates")
 
 
 class LibroApp(LabServerApp):
 
     # -------------- Required traits --------------
     name = "libro"
-    default_url = Unicode("/libro", help="The default URL to redirect to from `/`")
+    default_url = Unicode(
+        "/libro", help="The default URL to redirect to from `/`")
     extension_url = "/libro"
     load_other_extensions = True
     file_url_prefix = "/libro-render"
@@ -64,6 +68,7 @@ class LibroApp(LabServerApp):
 
         self.handlers.extend(
             [
+                (rf"/{self.name}/api/upload", UploadHandler),
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
                 (rf"/{self.name}/interaction", LibroLabHandler),

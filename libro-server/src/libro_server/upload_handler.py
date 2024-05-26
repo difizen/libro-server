@@ -1,19 +1,18 @@
 import json
 import os
 from jupyter_server.base.handlers import APIHandler
-from jupyter_server.auth.decorator import allow_unauthenticated
+from jupyter_server.auth.decorator import authorized, allow_unauthenticated
 from tornado.web import HTTPError, authenticated
-from .libro_execution import execute_notebook, LibroNotebookClient
+from libro_flow import execute_notebook, LibroNotebookClient
 from jupyter_server.utils import ApiPath, to_os_path, to_api_path
 from jupyter_core.utils import ensure_dir_exists
 from contextlib import contextmanager
 import errno
+from traitlets import Unicode
+import oss2
 
 
-class LibroExecutionHandler(APIHandler):
-    executors: dict[str, LibroNotebookClient] = {}
-
-    execution_dir = "execution"
+class UploadHandler(APIHandler):
 
     def _get_os_path(self, path):
         """Given an API path, return its file system path.
@@ -52,7 +51,8 @@ class LibroExecutionHandler(APIHandler):
             raise HTTPError(404, f"{path} is not a valid path") from None
 
         if not (os.path.abspath(os_path) + os.path.sep).startswith(root):
-            raise HTTPError(404, "%s is outside root contents directory" % path)
+            raise HTTPError(
+                404, "%s is outside root contents directory" % path)
         return os_path
 
     @contextmanager
@@ -72,56 +72,65 @@ class LibroExecutionHandler(APIHandler):
             else:
                 raise
 
-    # Checkpoint-related utilities
-    def result_path(self, path: str):
-        path = path.strip("/")
-        parent, name = ("/" + path).rsplit("/", 1)
-        parent = parent.strip("/")
-        basename, ext = os.path.splitext(name)
-        filename = f"{basename}{ext}"
-        os_path = self._get_os_path(path=parent)
-        execution_dir = os.path.join(os_path, self.execution_dir)
-        with self.perm_to_403():
-            ensure_dir_exists(execution_dir)
-        execution_path = os.path.join(execution_dir, filename)
-        return execution_path
-
     @allow_unauthenticated
     async def post(self) -> None:
+        self.set_header("Content-Type", "application/json")
+        # model = self.get_json_body()
+        # if model is None:
+        #     raise HTTPError(400, "can not get arguments")
+
+        fileinfo = self.request.files["file"][0]
+        filename = fileinfo["filename"]
+        try:
+            # TODO: AK
+            auth = oss2.Auth(
+                access_key_id="",
+                access_key_secret="",
+            )
+            bucket = oss2.Bucket(
+                auth, "http://oss-cn-beijing.aliyuncs.com", "nl2quant")
+            result = bucket.put_object(filename, fileinfo["body"])
+            if result.status == 200:
+                self.log.info(
+                    "%s uploaded %s, saved as %s",
+                    str(self.request.remote_ip),
+                    filename,
+                    filename,
+                )
+            else:
+                raise IOError("upload to oss failed")
+        except IOError as e:
+            self.log.error("Failed to write file due to IOError %s", str(e))
+        self.write(json.dumps({"filename": filename}))
+
+    @allow_unauthenticated
+    async def put(self) -> None:
         self.set_header("Content-Type", "application/json")
         model = self.get_json_body()
         if model is None:
             raise HTTPError(400, "can not get arguments")
-        file = model.get("file")
-        args = model.get("args")
-        if file is None:
-            raise HTTPError(400, "file is missing")
-        if not isinstance(file, str):
-            raise HTTPError(400, "file is invalid")
-        file_full_path = self._get_os_path(file)
-        result_path = self.result_path(file)
-        client = execute_notebook(
-            notebook=file_full_path, args=args, execute_record_path=result_path
-        )
-        self.executors[file_full_path] = client
-        self.executors[str(client.execution.id)] = client
-        self.write(json.dumps({"file": file, "id": str(client.execution.id)}))
 
-    @allow_unauthenticated
-    async def get(self) -> None:
-        file = self.request.arguments.get("file")
-        if file is not None:
-            file = "".join(map(bytes.decode, file))
-        id = self.request.query_arguments.get("id")
-        if id is not None:
-            id = "".join(map(bytes.decode, id))
-        client = None
-        if isinstance(id, str):
-            client = self.executors.get(id)
-        if client is None:
-            if isinstance(file, str):
-                file_full_path = self._get_os_path(file)
-                client = self.executors[file_full_path]
-        if client is None:
-            raise HTTPError(400, "client not found")
-        self.write(client.get_status().model_dump_json())
+        filename = model.get("filename")
+        try:
+            os_path = self._get_os_path(filename)
+            # TODO: AK
+            auth = oss2.Auth(
+                access_key_id="",
+                access_key_secret="",
+            )
+            bucket = oss2.Bucket(
+                auth, "http://oss-cn-beijing.aliyuncs.com", "nl2quant")
+            with open(os_path, "rb") as fileobj:
+                result = bucket.put_object(filename, fileobj)
+                if result.status == 200:
+                    self.log.info(
+                        "%s uploaded %s, saved as %s",
+                        str(self.request.remote_ip),
+                        filename,
+                        filename,
+                    )
+                else:
+                    raise IOError("upload to oss failed")
+        except IOError as e:
+            self.log.error("Failed to write file due to IOError %s", str(e))
+        self.write(json.dumps({"filename": filename}))
