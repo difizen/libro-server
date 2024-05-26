@@ -2,8 +2,9 @@ import json
 import os
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.auth.decorator import authorized, allow_unauthenticated
-from libro_server.hackthon.agent import MyCustomHandler,agent
+from libro_server.hackthon.agent import MyCustomHandler, agent
 from tornado.web import HTTPError, authenticated
+from tornado import gen
 from libro_flow import execute_notebook, LibroNotebookClient
 from jupyter_server.utils import ApiPath, to_os_path, to_api_path
 from jupyter_core.utils import ensure_dir_exists
@@ -11,9 +12,14 @@ from contextlib import contextmanager
 import errno
 from traitlets import Unicode
 import uuid
-from libro_server.hackthon_globals import NotebooksInfo, run_id_to_notebooks,run_id_to_agent_task
+from libro_server.hackthon_globals import (
+    NotebooksInfo,
+    run_id_to_notebooks,
+    run_id_to_agent_task,
+)
 from langchain_core.runnables.config import RunnableConfig
 import asyncio
+
 
 class LibroChatHandler(APIHandler):
     executors: dict[str, LibroNotebookClient] = {}
@@ -91,7 +97,6 @@ class LibroChatHandler(APIHandler):
         execution_path = os.path.join(execution_dir, filename)
         return execution_path
 
-    @authenticated
     @allow_unauthenticated
     async def post(self) -> None:
         self.set_header("Content-Type", "application/json")
@@ -104,32 +109,38 @@ class LibroChatHandler(APIHandler):
 
         run_id = uuid.uuid4()
         print(run_id)
-        callback = MyCustomHandler(post_method=self.finish)
-        runconfig = RunnableConfig(
-            callbacks=[callback]
-        )
+
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
+
+        def callback_finish(result):
+            future.set_result(result)
+
+        callback = MyCustomHandler(post_method=callback_finish)
+        runconfig = RunnableConfig(callbacks=[callback])
         run_id = str(uuid.uuid4())
         if input is None:
             raise HTTPError(400, "input is missing")
         if not isinstance(input, str):
             raise HTTPError(400, "input is invalid")
-        task = asyncio.create_task(agent.invoke({"input": input}, runconfig))
-        print("task",task)
-        run_id_to_agent_task[run_id] = task
+        task = asyncio.create_task(agent.ainvoke({"input": input}, runconfig))
+        result = await future
+        print("chat result", result)
+        self.write(json.dumps(result))
 
-    @authenticated
     @allow_unauthenticated
-    async def get(self) -> None:
+    def get(self) -> None:
         run_id = self.request.query_arguments.get("runId")
+        print("get chat", run_id)
         if run_id is not None:
             run_id = "".join(map(bytes.decode, run_id))
         res = None
         if isinstance(run_id, str):
-            notebooks_res:NotebooksInfo = run_id_to_notebooks.get(run_id)
-            print('notebooks_res',notebooks_res)
+            notebooks_res: NotebooksInfo = run_id_to_notebooks.get(run_id)
+            print("notebooks_res", notebooks_res)
             if notebooks_res is None:
                 raise HTTPError(400, "run_id is invalid")
-            notebooks_clients= notebooks_res.get("render_notebooks").stack
+            notebooks_clients = notebooks_res.get("render_notebooks").stack
             if notebooks_clients is None:
                 raise HTTPError(400, "notebooks_clients is None")
             notebooks = []
@@ -138,9 +149,9 @@ class LibroChatHandler(APIHandler):
                 notebooks.append(client.get_status().model_dump_json())
                 print("chat get after")
             res = {
-                "id":run_id,
-                "status":notebooks_res.get("status"),
-                "notebooks":notebooks
+                "id": run_id,
+                "status": notebooks_res.get("status"),
+                "notebooks": notebooks,
             }
         else:
             raise HTTPError(400, "run_id is invalid")
