@@ -1,14 +1,16 @@
 import json
 import os
 from jupyter_server.base.handlers import APIHandler
-from jupyter_server.auth.decorator import authorized, allow_unauthenticated
+from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
-from libro_flow import execute_notebook, LibroNotebookClient
+try:
+    from libro_flow import execute_notebook, LibroNotebookClient
+except ImportError:
+    pass
 from jupyter_server.utils import ApiPath, to_os_path, to_api_path
 from jupyter_core.utils import ensure_dir_exists
 from contextlib import contextmanager
 import errno
-from traitlets import Unicode
 
 
 class LibroExecutionHandler(APIHandler):
