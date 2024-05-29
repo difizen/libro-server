@@ -41,6 +41,6 @@ libro
 
 ### libro-flow
 
-- cd libro-flowrye sync
+- cd libro-flow
 - rye build
 - rye publish
