@@ -1,14 +1,12 @@
 import os
 from glob import glob
-from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 from traitlets import Unicode
-from jupyterlab_server import LabConfig, LabServerApp, add_handlers
+from jupyterlab_server import LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
 from os.path import relpath
 
 from .static_handler import LibroLabHandler
 from .workspace_handler import LibroWorkspaceHandler
-from .execution_handler import LibroExecutionHandler
 
 DEFAULT_STATIC_FILES_PATH = os.path.join(os.path.dirname(__file__), "static")
 DEFAULT_TEMPLATE_FILES_PATH = os.path.join(os.path.dirname(__file__), "templates")
@@ -67,7 +65,6 @@ class LibroApp(LabServerApp):
         self.handlers.extend(
             [
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
-                (rf"/{self.name}/api/execution", LibroExecutionHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
                 (rf"/{self.name}/interaction", LibroLabHandler),
                 (rf"/{self.name}/?", LibroLabHandler),
