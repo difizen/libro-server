@@ -3,10 +3,7 @@ import os
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
-try:
-    from libro_flow import execute_notebook, LibroNotebookClient
-except ImportError:
-    pass
+from .libro_execution import execute_notebook, LibroNotebookClient
 from jupyter_server.utils import ApiPath, to_os_path, to_api_path
 from jupyter_core.utils import ensure_dir_exists
 from contextlib import contextmanager
