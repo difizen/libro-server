@@ -21,6 +21,7 @@ c = get_config()  # noqa
 #  Default: 30
 c.Application.log_level = 0
 
+
 # Configure additional log handlers.
 #
 #  The default stderr logs handler is configured by the log_level, log_datefmt
@@ -128,7 +129,7 @@ c.Application.log_level = 0
 
 # Set the Access-Control-Allow-Credentials: true header
 #  Default: False
-# c.ServerApp.allow_credentials = False
+c.ServerApp.allow_credentials = True
 
 # Set the Access-Control-Allow-Origin header
 #
@@ -136,7 +137,7 @@ c.Application.log_level = 0
 #
 #          Takes precedence over allow_origin_pat.
 #  Default: ''
-c.ServerApp.allow_origin = "*"
+c.ServerApp.allow_origin = 'https://zhu-pre.alipay.com'
 
 # Use a regular expression for the Access-Control-Allow-Origin header
 #
@@ -172,7 +173,6 @@ c.ServerApp.allow_remote_access = True
 # Whether to allow the user to run the server as root.
 #  Default: False
 c.ServerApp.allow_root = True
-
 # Answer yes to any prompts.
 #  See also: JupyterApp.answer_yes
 # c.ServerApp.answer_yes = False
@@ -344,6 +344,7 @@ c.ServerApp.jpserver_extensions = {
     "libro_server": True,
     "jupyter_lsp": True,
     "libro_flow": True,
+    "libro_ai": True,
 }
 
 # The kernel manager class to use.
@@ -538,7 +539,11 @@ c.ServerApp.token = ""
 
 # Supply overrides for the tornado.web.Application that the Jupyter server uses.
 #  Default: {}
-# c.ServerApp.tornado_settings = {}
+c.ServerApp.tornado_settings = {
+    'headers': {
+        'Access-Control-Allow-Headers': 'content-type,x-xsrftoken,priority'
+    }
+}
 
 # Whether to trust or not X-Scheme/X-Forwarded-Proto and X-Real-Ip/X-Forwarded-
 #  For headerssent by the upstream reverse proxy. Necessary if the proxy handles

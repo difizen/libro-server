@@ -1,10 +1,6 @@
 import asyncio
-import json
-from nbclient.util import ensure_async, run_sync
 from libro_flow.libro_schema_form_widget import SchemaFormWidget
-from numpy import void
 from pydantic import BaseModel
-from nbformat import NotebookNode
 from IPython.display import display
 from .libro_client import LibroNotebookClient
 from jupyter_client.manager import KernelManager

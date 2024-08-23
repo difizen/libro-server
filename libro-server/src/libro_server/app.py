@@ -1,6 +1,7 @@
 import os
 from glob import glob
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
+from libro_server.login_handler import LoginHandler
 from libro_server.upload_handler import UploadHandler
 from traitlets import Unicode
 from jupyterlab_server import LabServerApp, add_handlers
@@ -66,11 +67,13 @@ class LibroApp(LabServerApp):
         # LIBRO_URL_PATTERN = (r"/(?P<libro>/libro/.*)?")
         # url_pattern = LIBRO_URL_PATTERN.format(self.app_url.replace("/", ""))
 
+        print('init_handler',self.name)
         self.handlers.extend(
             [
                 (rf"/{self.name}/api/upload", UploadHandler),
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
+                (rf"/{self.name}/login", LoginHandler),
                 (rf"/{self.name}/interaction", LibroLabHandler),
                 (rf"/{self.name}/?", LibroLabHandler),
             ]

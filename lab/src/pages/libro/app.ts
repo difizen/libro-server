@@ -37,6 +37,14 @@ export class LibroApp implements ApplicationContribution {
       baseUrl,
       wsUrl: baseUrl.replace(/^http(s)?/, 'ws$1'),
     });
+    console.log("🚀 ~ LibroApp ~ onStart ~ login:")
+    this.serverConnection.makeRequest(
+      `${this.serverConnection.settings.baseUrl}libro/login`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ user_id:'test123' }),
+      },
+    );
     this.serverManager.launch();
   }
 }

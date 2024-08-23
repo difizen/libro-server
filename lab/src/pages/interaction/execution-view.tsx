@@ -46,6 +46,7 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
   const formRef = useRef<any | null>(null);
   const instance = useInject<LibroExecutionView>(ViewInstance);
   const queryParams = qs.parse(window.location.search);
+  console.log("🚀 ~ LibroExecutionComponent ~ queryParams:", queryParams)
   const filePath = queryParams['path'];
   const appView = useObserve(instance.libroView);
   useEffect(() => {

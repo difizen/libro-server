@@ -12,6 +12,7 @@ import qs from 'query-string';
 export const LibroExecutionFileComponent = forwardRef<HTMLDivElement>(
   function LibroExecutionFileComponent(props, ref) {
     const queryParams = qs.parse(window.location.search);
+    console.log("🚀 ~ LibroExecutionFileComponent ~ queryParams:", queryParams)
     const instance = useInject<LibroExecutionFileView>(ViewInstance);
     const filePath = queryParams['path'];
     useEffect(() => {

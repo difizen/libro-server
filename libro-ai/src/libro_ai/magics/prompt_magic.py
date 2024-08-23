@@ -86,6 +86,7 @@ class PromptMagic(Magics):
             chat_key = args.get("model_name")
         prompt: str = args.get("prompt")
         filename: str = args.get("filename")
+        file_url: str = args.get("file_url")
         cell_id: str = args.get("cell_id")
 
         if (
@@ -109,7 +110,6 @@ class PromptMagic(Magics):
                 formattedPrompt = template.invoke(local_ns)
                 messages = formattedPrompt.to_messages()
                 if filename:
-                    url = "https://nl2quant.oss-cn-beijing.aliyuncs.com/" + filename
                     msg = messages[len(messages) - 1]
                     if isinstance(msg.content, str):
                         text = msg.content
@@ -118,13 +118,13 @@ class PromptMagic(Magics):
                         ]
                         lower_name = filename.lower()
                         if lower_name.endswith(".pdf"):
-                            content.append({"type": "pdf_url", "pdf_url": url})
+                            content.append({"type": "pdf_url", "pdf_url": file_url})
                         if (
                             lower_name.endswith(".jpg")
                             or lower_name.endswith(".png")
                             or lower_name.endswith(".jpeg")
                         ):
-                            content.append({"type": "image_url", "image_url": url})
+                            content.append({"type": "image_url", "image_url": file_url})
                         new_msg = HumanMessage(content=content)
                         messages[len(messages) - 1] = new_msg
                 res = None

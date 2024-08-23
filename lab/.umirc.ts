@@ -25,6 +25,12 @@ export default defineConfig({
       secure: false,
       ws: true,
     },
+    '/libro/login': {
+      target: 'http://localhost:8888/',
+      changeOrigin: true,
+      secure: false,
+      ws: true,
+    },
   },
   extraBabelPlugins: [
     ['@babel/plugin-proposal-decorators', { legacy: true }],

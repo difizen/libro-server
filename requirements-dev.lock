@@ -6,15 +6,18 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
 
+-e file:libro-server
 -e file:libro-ai
 -e file:libro-flow
--e file:libro-server
 aiohttp==3.9.3
     # via langchain
     # via langchain-community
 aiosignal==1.3.1
     # via aiohttp
+alipay-sdk-python==3.7.198
+    # via libro
 aliyun-python-sdk-core==2.15.1
     # via aliyun-python-sdk-kms
     # via oss2
@@ -266,9 +269,12 @@ ptyprocess==0.7.0
     # via terminado
 pure-eval==0.2.2
     # via stack-data
+pyasn1==0.6.0
+    # via rsa
 pycparser==2.22
     # via cffi
 pycryptodome==3.20.0
+    # via alipay-sdk-python
     # via oss2
 pydantic==2.6.4
     # via langchain
@@ -324,6 +330,8 @@ rfc3986-validator==0.1.1
 rpds-py==0.18.0
     # via jsonschema
     # via referencing
+rsa==4.9
+    # via alipay-sdk-python
 ruff==0.3.5
     # via ruff-lsp
 ruff-lsp==0.0.53
@@ -363,7 +371,8 @@ tornado==6.4
     # via jupyter-client
     # via jupyter-server
     # via terminado
-tqdm==4.66.2
+tqdm==4.66.5
+    # via libro-ai
     # via openai
 traitlets==5.14.2
     # via comm

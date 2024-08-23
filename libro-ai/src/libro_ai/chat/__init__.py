@@ -1,5 +1,6 @@
 from .executor import LLMChat, ChatExecutor
 from .openai import OpenAIChatObjectProvider
+from .fin import ExpertProvider
 from .object_manager import ChatObjectManager
 from .source import CHAT_SOURCE
 from .object import ChatObject, ChatObjectProvider
@@ -8,8 +9,9 @@ from .chat_record import ChatMessage, ChatRecord, ChatRecordProvider
 from .utils import get_message_str
 
 chat_object_manager = ChatObjectManager()
-chat_object_manager.register_provider(OpenAIChatObjectProvider())
-chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
+# chat_object_manager.register_provider(OpenAIChatObjectProvider())
+# chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
+chat_object_manager.register_provider(ExpertProvider())
 
 chat_record_provider = ChatRecordProvider()
 
