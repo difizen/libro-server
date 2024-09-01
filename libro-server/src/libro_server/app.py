@@ -3,6 +3,7 @@ from glob import glob
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 from libro_server.login_handler import LoginHandler
 from libro_server.upload_handler import UploadHandler
+from libro_server.zxz_handler import ZxzHandler
 from traitlets import Unicode
 from jupyterlab_server import LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
@@ -71,6 +72,7 @@ class LibroApp(LabServerApp):
         self.handlers.extend(
             [
                 (rf"/{self.name}/api/upload", UploadHandler),
+                (rf"/{self.name}/api/zxz-upload", ZxzHandler),
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
                 (rf"/{self.name}/login", LoginHandler),
