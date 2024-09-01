@@ -81,15 +81,15 @@ class ZxzHandler(APIHandler):
 
         args = self.request.query_arguments
         arg_path = args.get('path', None)
+        arg_path = b''.join(arg_path).decode('utf-8')
         if arg_path is None:
             raise IOError("Can not get file path")
         
         try:
+            file_path = self._get_os_path(arg_path)
             config_path = '/config/config.txt'  # 文件路径
             with open(config_path, 'r', encoding='utf-8') as file:
                 user_id = file.read()
-            file_path = self._get_os_path(arg_path)
-            
             
             # user_id = '2088502728605001'
             # file_path = '/Users/brokun/github/libro-server/examples/a-test.jpeg'
