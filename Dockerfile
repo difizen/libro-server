@@ -1,9 +1,32 @@
 # 使用 python 3.11 作为基础镜像
 FROM python:3.11-slim-bookworm
 
+# 创建 ADMIN 用户并设置其为非特权用户
+RUN useradd -m admin
+
 # 安装 libro 包
 RUN pip install libro
-RUN mkdir -p ~/.jupyter
-COPY docker/jupyter_server_config.py ~/.jupyter/jupyter_server_config.py
 
-CMD ["libro", '--port', '8889',"--allow-root"]
+# 创建 Jupyter 配置目录和工作区目录
+RUN mkdir -p /home/admin/.jupyter /home/admin/workspace
+
+# 复制 Jupyter 配置文件
+COPY docker/jupyter_server_config.py /home/admin/.jupyter/jupyter_server_config.py
+
+# 复制启动脚本到镜像中
+COPY docker/start.sh /home/admin/start.sh
+
+# 赋予启动脚本执行权限
+RUN chmod +x /home/admin/start.sh
+
+# 更改文件和目录的所有权为 admin 用户
+RUN chown -R admin:admin /home/admin
+
+# 切换到 admin 用户
+USER admin
+
+# 设置工作目录为 admin 用户的主目录
+WORKDIR /home/admin
+
+# 使用 ENTRYPOINT 来设置启动脚本
+ENTRYPOINT ["/home/admin/start.sh"]
