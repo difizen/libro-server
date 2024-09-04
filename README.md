@@ -1,46 +1,51 @@
-# Libro
+# libro-server
 
-## 使用
+libro-server 是 libro 的服务端，基于 jupyter-server 开发。
+
+## 安装
 
 ```sh
-pip install libro libro-ai
-libro
+pip install libro
 ```
 
-## 开发
-
-本项目包含 lab 目录下的 libro-lab 前端工程和 libro-server、libro-ai 两个 python 包，分别在 libro-server 和 libro-ai 目录下。
-
-### 基础环境
-
-我们使用 rye 来管理多 python 包组成 monorepo，多个包会共享同一个虚拟环境 venv
-
-- install `rye` `npm`
-- rye sync
-
-### libro-lab
-
-- cd lab
-- npm install
-- npm run build
-- npm run deploy
+## 模块
 
 ### libro-server
 
-- cd libro-server
-- npm i
-- rye run dev
-- rye build
-- rye publish
+web 服务，在 jupyter-server 的基础上提供更丰富的交互能力。
 
 ### libro-ai
 
-- cd libro-ai
-- rye build
-- rye publish
+为 libro 提供对大模型和智能体的连接能力，让 libro 可以 i 通过 magic function 直接使用大模型。
 
 ### libro-flow
 
-- cd libro-flow
-- rye build
-- rye publish
+提供 libro 执行器、参数化等能力，让 libro 可以在更多场景被消费。
+
+### lab
+
+前端工程，提供 libro 服务的默认 web 客户端。
+
+## 更多
+
+### 提交 issue
+
+😊 我们建议您使用[github issue](https://github.com/difizen/libro-server/issues) 提交您的疑问, 我们通常会在 2 日内回复。
+
+### 贡献代码
+
+🤝 请查阅 [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+### 贡献者
+
+💪 感谢所有的贡献者
+
+<a href="https://github.com/difizen/mana/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=difizen/libro-server" alt="List of Contributors"/>
+</a>
+
+### 联系我们
+
+🤗 加入我们的钉钉答疑群与我们联系。
+
+<img src="https://libro.difizen.net/ding-qrcode.png" width="30%">
