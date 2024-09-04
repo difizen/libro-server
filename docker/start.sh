@@ -7,4 +7,4 @@ if [ -z "$PORT" ]; then
 fi
 
 # 启动 libro，并将 PORT 环境变量传递给它
-exec libro --port="$PORT"
+exec libro --port="$PORT" --notebook-dir="/home/admin/workspace"
