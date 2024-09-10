@@ -4,6 +4,7 @@ version = "0.1.3"
 description = "libro ai"
 authors = [
     { name = "brokun", email = "brokun0128@gmail.com" },
+    { name = "sunshinesmilelk", email= "1176136681@qq.com"},
     { name = "zhanba", email = "c5e1856@gmail.com" }
 ]
 dependencies = [
