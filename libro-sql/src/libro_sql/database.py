@@ -89,6 +89,11 @@ class DatabaseManager():
         else:
             raise Exception(
                 'Can not execute sql before database config set')
-
+        
+    def get_db_config(self):
+        if self.db is None:
+            return None
+        else:
+            return self.db.config
 
 db = DatabaseManager()
