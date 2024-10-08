@@ -7,7 +7,7 @@ authors = [
     { name = "brokun", email = "brokun0128@gmail.com" },
 ]
 dependencies = [
-
+    "pyyaml>=6.0.2",
 ]
 dev-dependencies = []
 readme = "README.md"
