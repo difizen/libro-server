@@ -75,11 +75,11 @@ class DatabaseManager():
     db: Optional[Database] = None
 
     def __init__(self) -> None:
-        libro_sql_config = libro_config.get_config().get("libro-sql")
+        libro_sql_config = libro_config.get_config().get("db")
         if libro_sql_config is not None:
             self.config(libro_sql_config)
         else:
-            raise ValueError(f"Can not find config of libro-sql")
+            raise ValueError(f"Can not find config of db")
 
     def config(self, c: dict):
         config = DatabaseConfig.model_validate(c)

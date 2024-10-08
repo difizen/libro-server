@@ -17,7 +17,7 @@ class OpenAIChat(LLMChat):
     def load(self):
         if is_langchain_installed():
             extra_params = {}
-            libro_ai_config = libro_config.get_config().get("libro-ai")
+            libro_ai_config = libro_config.get_config().get("llm")
             if libro_ai_config is not None:
                 if api_key := libro_ai_config.get("OPENAI_API_KEY"):
                     extra_params["api_key"] = api_key
