@@ -7,7 +7,7 @@ from langchain_core.messages import AIMessage
 from langchain.callbacks import get_openai_callback
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from IPython.display import display
-
+from libro_core.config import libro_config
 
 class OpenAIChat(LLMChat):
     name: str = "chatgpt"
@@ -16,7 +16,12 @@ class OpenAIChat(LLMChat):
 
     def load(self):
         if is_langchain_installed():
-            self.chat = ChatOpenAI(model_name=self.model)
+            extra_params = {}
+            libro_ai_config = libro_config.get_config().get("libro-ai")
+            if libro_ai_config is not None:
+                if api_key := libro_ai_config.get("OPENAI_API_KEY"):
+                    extra_params["api_key"] = api_key
+            self.chat = ChatOpenAI(model_name=self.model,**extra_params)
             return True
         return False
 
