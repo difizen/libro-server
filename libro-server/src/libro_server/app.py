@@ -1,9 +1,11 @@
 import os
 from glob import glob
+from libro_server.libro_kernel_manager import LibroKernelManager
 from traitlets import Unicode
 from jupyterlab_server import LabServerApp, add_handlers
 from jupyter_server.utils import url_path_join as ujoin
 from os.path import relpath
+import typing as t
 
 from .static_handler import LibroLabHandler
 from .workspace_handler import LibroWorkspaceHandler
@@ -29,6 +31,10 @@ class LibroApp(LabServerApp):
     # Local path to templates directory.
     template_paths = [DEFAULT_TEMPLATE_FILES_PATH]
 
+    def __init__(self, **kwargs: t.Any) -> None:
+        super().__init__(**kwargs)
+        self.serverapp.kernel_manager_class = LibroKernelManager
+        
     # ----------- add custom traits below ---------
 
     def initialize_settings(self) -> None:
