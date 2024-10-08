@@ -6,10 +6,13 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
 
--e file:libro-ai
--e file:libro-flow
 -e file:libro-server
+-e file:libro-ai
+-e file:libro-core
+    # via libro-sql
+-e file:libro-flow
 -e file:libro-sql
 aiohttp==3.9.3
     # via langchain
@@ -271,11 +274,12 @@ python-json-logger==2.0.7
     # via jupyter-events
 pytz==2024.2
     # via pandas
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via jupyter-events
     # via langchain
     # via langchain-community
     # via langchain-core
+    # via libro-core
 pyzmq==25.1.2
     # via ipykernel
     # via jupyter-client
