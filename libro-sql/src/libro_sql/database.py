@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
-
+from libro_core.config import libro_config
 
 class DatabaseConfig(BaseModel):
     db_type: str
@@ -73,6 +73,13 @@ class Database:
 
 class DatabaseManager():
     db: Optional[Database] = None
+
+    def __init__(self) -> None:
+        libro_sql_config = libro_config.get_config().get("libro-sql")
+        if libro_sql_config is not None:
+            self.config(libro_sql_config)
+        else:
+            raise ValueError(f"Can not find config of libro-sql")
 
     def config(self, c: dict):
         config = DatabaseConfig.model_validate(c)

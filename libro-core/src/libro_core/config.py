@@ -5,17 +5,17 @@ import yaml
 logger = logging.getLogger('jupyter_server')
 
 default_config = {
-    "libro-ai":{
-        'OPENAI_API_KEY': None,
-    },
-    "libro-sql":{
-        'db_type': '',
-        'username': '',
-        'password': '',
-        'host': '',
-        'port': 5432,
-        'database': ''
-    }
+    # "libro-ai":{
+    #     'OPENAI_API_KEY': None,
+    # },
+    # "libro-sql":{
+    #     'db_type': 'sqlite',
+    #     'username': '',
+    #     'password': '',
+    #     'host': '',
+    #     'port': 1111,
+    #     'database': 'sql_demo.db'
+    # }
 }
 
 def load_config_from_file(file_path):
@@ -98,11 +98,9 @@ class LibroConfig():
     def __init__(self):
         global config_count
         config_count += 1
-        print('config:', config_count)
 
     def load_config(self, project_root_path=None, **kwargs):
         config = load_config(kwargs, project_root_path)
-        print("libro-config-info-load",config)
         self.config = config
         self.is_loaded_config = True
     

@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.9.1",
     "psycopg2-binary>=2.9.9",
     "pymysql>=1.1.1",
+    "libro-core>=0.1.1",
 ]
 dev-dependencies = []
 readme = "README.md"
