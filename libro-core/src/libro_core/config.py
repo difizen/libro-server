@@ -5,17 +5,6 @@ import yaml
 logger = logging.getLogger('jupyter_server')
 
 default_config = {
-    # "libro-ai":{
-    #     'OPENAI_API_KEY': None,
-    # },
-    # "libro-sql":{
-    #     'db_type': 'sqlite',
-    #     'username': '',
-    #     'password': '',
-    #     'host': '',
-    #     'port': 1111,
-    #     'database': 'sql_demo.db'
-    # }
 }
 
 def load_config_from_file(file_path):
