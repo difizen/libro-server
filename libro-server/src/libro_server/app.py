@@ -28,6 +28,11 @@ class LibroApp(LabServerApp):
     # Local path to templates directory.
     template_paths = [DEFAULT_TEMPLATE_FILES_PATH]
 
+    def initialize(self, *args, **kwargs):
+        super().initialize(*args, **kwargs)
+        #自动注册自身为 Jupyter Server 扩展
+        self.serverapp.jpserver_extensions[self.name] = True
+
     @property
     def config_file_paths(self):
         """Look on the same path as our parent for config files"""
