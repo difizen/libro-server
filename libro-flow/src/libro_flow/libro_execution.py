@@ -1,10 +1,8 @@
 import asyncio
-import json
-from nbclient.util import ensure_async, run_sync
 from libro_flow.libro_schema_form_widget import SchemaFormWidget
-from numpy import void
+import nbformat
+import os
 from pydantic import BaseModel
-from nbformat import NotebookNode
 from IPython.display import display
 from .libro_client import LibroNotebookClient
 from jupyter_client.manager import KernelManager
@@ -82,12 +80,36 @@ def load_execution_result(pickle_file_path):
 
 
 def load_notebook_node(notebook_path):
-    import nbformat
+    # 获取文件后缀名
+    _, ext = os.path.splitext(notebook_path)
+    
+    if ext == '.ipynb':
+        # 加载 .ipynb 文件
+        nb = nbformat.read(notebook_path, as_version=4)
+        nb_upgraded = nbformat.v4.upgrade(nb)
+        if nb_upgraded is not None:
+            nb = nb_upgraded
+        return nb
+    elif ext == '.py':
+        # 加载 .py 文件并转换为 notebook
+        return load_python_as_notebook(notebook_path)
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")
 
-    nb = nbformat.read(notebook_path, as_version=4)
-    nb_upgraded = nbformat.v4.upgrade(nb)
-    if nb_upgraded is not None:
-        nb = nb_upgraded
+def load_python_as_notebook(python_path):
+    # 创建一个空的 notebook 节点
+    nb = nbformat.v4.new_notebook()
+    
+    # 读取 .py 文件内容
+    with open(python_path, 'r') as f:
+        python_code = f.read()
+
+    # 将 Python 代码转换为单个代码单元格
+    code_cell = nbformat.v4.new_code_cell(source=python_code)
+    
+    # 将代码单元格加入到 notebook
+    nb.cells.append(code_cell)
+    
     return nb
 
 
