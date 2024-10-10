@@ -80,6 +80,7 @@ class LibroApp(LabServerApp):
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
                 (rf"/{self.name}/execution", LibroLabHandler),
                 (rf"/{self.name}/interaction", LibroLabHandler),
+                (rf"/{self.name}/interpreter", LibroLabHandler),
                 (rf"/{self.name}/?", LibroLabHandler),
             ]
         )
