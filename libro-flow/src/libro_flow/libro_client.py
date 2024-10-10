@@ -73,7 +73,7 @@ class LibroExecution(BaseModel):
 class LibroNotebookClient(NotebookClient):
     execution: LibroExecution = LibroExecution()
     iframe_url: str | None
-    upload_url: str | None
+    jp_base_url: str | None
 
     def __init__(
         self,
@@ -83,7 +83,7 @@ class LibroNotebookClient(NotebookClient):
         execute_result_path: str | None = None,
         execute_record_path: str | None = None,
         iframe_url: str | None = None,
-        upload_url: str | None = None,
+        jp_base_url: str | None = None,
         **kw,
     ):
         super().__init__(nb=nb, km=km, **kw)
@@ -94,7 +94,7 @@ class LibroNotebookClient(NotebookClient):
         self.execute_result_path = execute_result_path
         self.execute_record_path = execute_record_path
         self.iframe_url = iframe_url
-        self.upload_url = upload_url
+        self.jp_base_url = jp_base_url
         self.start_time = None
         self.end_time = None
 

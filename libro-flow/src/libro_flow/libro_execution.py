@@ -168,7 +168,7 @@ def execute_notebook_sync(
 def execute_notebook_sync_to_markdown(
     execute: Any,
     iframe_url:str,
-    upload_url: str,
+    jp_base_url: str,
     args=None,
     execute_result_path: str | None = None,
     execute_record_path: str | None = None,
@@ -187,7 +187,7 @@ def execute_notebook_sync_to_markdown(
         execute_result_path=execute_result_path,
         execute_record_path=execute_record_path,
         iframe_url = iframe_url,
-        upload_url = upload_url,
+        jp_base_url = jp_base_url,
         **kwargs,
     )
     client.update_execution()
