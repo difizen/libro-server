@@ -1,9 +1,10 @@
 
-from typing import Optional
+from typing import Dict
 from pydantic import BaseModel
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
+import uuid
 from libro_core.config import libro_config
 
 class DatabaseConfig(BaseModel):
@@ -17,9 +18,11 @@ class DatabaseConfig(BaseModel):
 
 class Database:
     config: DatabaseConfig
+    id: str
 
     def __init__(self, config: DatabaseConfig):
         self.config = config
+        self.id = str(uuid.uuid4())
         self.engine = self._create_engine()
 
     def _create_engine(self):
@@ -41,6 +44,16 @@ class Database:
         except Exception as e:
             print(f"Error creating engine: {e}")
             raise
+    # 添加一个方法用于将对象转换为字典
+    def to_dict(self):
+        return {
+            "db_type": self.config.db_type,
+            "id": self.id,
+            "password": self.config.password,
+            "host": self.config.host,
+            "port": self.config.port,
+            "database": self.config.database
+        }
 
     def execute(self, query):
         """Execute a SQL query or non-query and return the result.
@@ -72,35 +85,32 @@ class Database:
 
 
 class DatabaseManager():
-    db: Optional[Database] = None
+    dbs: Dict[str, Database] = {}
 
     def __init__(self) -> None:
         libro_sql_config = libro_config.get_config().get("db")
-        if libro_sql_config is not None:
-            self.config(libro_sql_config)
-        else:
-            raise ValueError(f"Can not find config of db")
+        for db in libro_sql_config:
+            self.config(db)
 
     def config(self, c: dict):
         config = DatabaseConfig.model_validate(c)
-        self.db = Database(config)
+        database = Database(config)
+        self.dbs[database.id] = database
 
-    def execute(self, query):
+    def execute(self, query,id):
         """Execute a SQL query or non-query and return the result.
 
         If the query is a SELECT statement, return the result as a DataFrame.
         For other statements (INSERT, UPDATE, DELETE), execute the statement and return the number of affected rows.
         """
-        if self.db is not None:
-            return self.db.execute(query)
+        execute_db = self.dbs.get(id)
+        if execute_db is not None:
+            return execute_db.execute(query)
         else:
             raise Exception(
                 'Can not execute sql before database config set')
         
-    def get_db_config(self):
-        if self.db is None:
-            return None
-        else:
-            return self.db.config
+    def to_dbs_array(self):
+        return [db.to_dict() for db in self.dbs.values()]
 
 db = DatabaseManager()
