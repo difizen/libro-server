@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4, UUID
 from nbclient import NotebookClient
 from nbclient.util import ensure_async, run_sync
@@ -7,6 +8,7 @@ from nbformat import NotebookNode
 from typing import Any
 import json
 from pydantic import BaseModel, Field
+import requests
 from traitlets import Callable
 import html  # 用于处理转义字符
 
@@ -59,6 +61,44 @@ def convert_output_to_markdown(output):
     
     return markdown_str
 
+def upload_notebook_to_jupyter(server_url, token, notebook_path, destination_path):
+    """
+    上传 .ipynb 文件到 Jupyter Server。
+    
+    :param server_url: Jupyter Server 的 URL（例如 http://localhost:8888）
+    :param token: Jupyter Server 的 Token 认证信息
+    :param notebook_path: 本地 .ipynb 文件路径
+    :param destination_path: 目标路径（相对于 Jupyter 根目录）
+    """
+    # 读取要上传的 .ipynb 文件内容
+    with open(notebook_path, 'r', encoding='utf-8') as f:
+        notebook_content = json.load(f)
+    
+    # 构建 API URL
+    url = f"{server_url}/api/contents/{destination_path}"
+    
+    # 设置 headers，包含认证 token
+    headers = {
+        "Authorization": f"Token {token}",
+        "Content-Type": "application/json",
+    }
+    
+    # 构建请求 payload
+    data = {
+        "type": "notebook",  # 这里指定文件类型为 "notebook"
+        "format": "json",    # Jupyter Notebook 文件是 JSON 格式的
+        "content": notebook_content  # 直接传递 JSON 格式的文件内容
+    }
+    
+    # 发送 PUT 请求上传文件
+    response = requests.put(url, headers=headers, json=data)
+    
+    # 检查响应状态
+    if response.status_code == 201:
+        print(f"Notebook 上传成功: {notebook_path} -> {destination_path}")
+    else:
+        print(f"Notebook 上传失败: {response.status_code} - {response.text}")
+
 class LibroExecution(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     current_index: int = 0
@@ -74,6 +114,8 @@ class LibroNotebookClient(NotebookClient):
     execution: LibroExecution = LibroExecution()
     iframe_url: str | None
     jp_base_url: str | None
+    upload_path: str | None
+    render_by_iframe: bool = False
 
     def __init__(
         self,
@@ -84,6 +126,7 @@ class LibroNotebookClient(NotebookClient):
         execute_record_path: str | None = None,
         iframe_url: str | None = None,
         jp_base_url: str | None = None,
+        upload_path: str | None = None,
         **kw,
     ):
         super().__init__(nb=nb, km=km, **kw)
@@ -97,6 +140,7 @@ class LibroNotebookClient(NotebookClient):
         self.jp_base_url = jp_base_url
         self.start_time = None
         self.end_time = None
+        self.upload_path = upload_path
 
     on_cell_execute = Callable(
         default_value=cellStartExecution,
@@ -177,8 +221,7 @@ class LibroNotebookClient(NotebookClient):
                         cell, index, execution_count=self.code_cells_executed + 1
                     )
                 except Exception:
-                    print("execute Exception",Exception)
-                    
+                    self.render_by_iframe = True
                 self.execution.current_index = index
                 self.execution.code_cells_executed = self.code_cells_executed
                 try:
@@ -192,6 +235,12 @@ class LibroNotebookClient(NotebookClient):
                 if self.execute_record_path is not None:
                     with open(self.execute_record_path, "w", encoding="utf-8") as f:
                         nbformat.write(self.nb, f)
+                    if self.render_by_iframe:
+                        if self.upload_path is None:
+                            filename = os.path.basename(self.execute_record_path)
+                            # 构建目标路径为 /upload 文件夹加上文件名
+                            self.upload_path = f"upload/{filename}"
+                        upload_notebook_to_jupyter(server_url=self.jp_base_url,token='',notebook_path=self.execute_record_path,destination_path=self.upload_path)
             self.set_widgets_metadata()
             self.kc.shutdown()
             # await self.inspect_execution_result()
