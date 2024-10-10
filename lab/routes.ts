@@ -12,6 +12,10 @@ export default [
     component: 'execution',
   },
   {
+    path: '/libro/interpreter',
+    component: 'interpreter',
+  },
+  {
     path: '/libro/execution',
     component: 'execution',
   },
