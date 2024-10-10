@@ -5,6 +5,7 @@ from .libro_execution import (
     load_execution_result,
     execute_notebook,
     execute_notebook_sync,
+    execute_notebook_sync_to_markdown,
     inspect_execution_result,
 )
 from .libro_client import LibroNotebookClient

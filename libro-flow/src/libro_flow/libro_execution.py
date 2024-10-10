@@ -79,20 +79,20 @@ def load_execution_result(pickle_file_path):
     return nb_output
 
 
-def load_notebook_node(notebook_path):
+def load_notebook_node(execute):
     # 获取文件后缀名
-    _, ext = os.path.splitext(notebook_path)
+    _, ext = os.path.splitext(execute)
     
     if ext == '.ipynb':
         # 加载 .ipynb 文件
-        nb = nbformat.read(notebook_path, as_version=4)
+        nb = nbformat.read(execute, as_version=4)
         nb_upgraded = nbformat.v4.upgrade(nb)
         if nb_upgraded is not None:
-            nb = nb_upgraded
+            nb = nb_upgraded   
         return nb
     elif ext == '.py':
         # 加载 .py 文件并转换为 notebook
-        return load_python_as_notebook(notebook_path)
+        return load_python_as_notebook(execute)
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
@@ -139,9 +139,8 @@ def execute_notebook(
     display(client.execute_result_path)
     return client
 
-
 def execute_notebook_sync(
-    notebook: Any,
+    execute: Any,
     args=None,
     execute_result_path: str | None = None,
     execute_record_path: str | None = None,
@@ -150,9 +149,9 @@ def execute_notebook_sync(
     **kwargs: Any,
 ):
     if notebook_parser is not None:
-        nb = notebook_parser(notebook)
+        nb = notebook_parser(execute)
     else:
-        nb = load_notebook_node(notebook)
+        nb = load_notebook_node(execute)
     client = LibroNotebookClient(
         nb=nb,
         km=km,
@@ -165,3 +164,33 @@ def execute_notebook_sync(
     client.execute()
     display(client.execute_result_path)
     return client
+
+def execute_notebook_sync_to_markdown(
+    execute: Any,
+    iframe_url:str,
+    upload_url: str,
+    args=None,
+    execute_result_path: str | None = None,
+    execute_record_path: str | None = None,
+    notebook_parser: Callable | None = None,
+    km: Union[KernelManager, None] = None,
+    **kwargs: Any,
+):
+    if notebook_parser is not None:
+        nb = notebook_parser(execute)
+    else:
+        nb = load_notebook_node(execute)
+    client = LibroNotebookClient(
+        nb=nb,
+        km=km,
+        args=args,
+        execute_result_path=execute_result_path,
+        execute_record_path=execute_record_path,
+        iframe_url = iframe_url,
+        upload_url = upload_url,
+        **kwargs,
+    )
+    client.update_execution()
+    md = client.execute_to_markdown()
+    display(client.execute_result_path)
+    return md

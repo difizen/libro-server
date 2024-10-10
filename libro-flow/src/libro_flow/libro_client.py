@@ -4,17 +4,60 @@ from nbclient.util import ensure_async, run_sync
 import nbformat
 import datetime
 from nbformat import NotebookNode
-from typing import Any, Optional
+from typing import Any
 import json
 from pydantic import BaseModel, Field
 from traitlets import Callable
+import html  # 用于处理转义字符
 
+# 定义MIME类型的优先级
+MIME_PRIORITY = ['text/markdown', 'text/html', 'image/png', 'image/jpeg', 'text/plain']
 
 def cellStartExecution(cell, **kwargs):
     cell.metadata.execution["shell.execute_reply.started"] = datetime.datetime.now(
         datetime.timezone.utc
     ).isoformat()
 
+
+def select_mimetype(data):
+    """从输出数据中选择最合适的MIME类型."""
+    for mimetype in MIME_PRIORITY:
+        if mimetype in data:
+            return mimetype
+    return None
+
+def convert_output_to_markdown(output):
+    """将单个输出转换为Markdown字符串，选择最合适的MIME类型."""
+    markdown_str = ""
+
+    # 处理stream类型输出（标准输出/标准错误）
+    if output['output_type'] == 'stream':
+        markdown_str += f"```\n{html.unescape(output['text'])}\n```"
+
+    # 处理执行结果或显示数据
+    elif output['output_type'] in ['execute_result', 'display_data']:
+        data = output.get('data', {})
+        
+        # 选择最合适的MIME类型
+        mimetype = select_mimetype(data)
+
+        if mimetype:
+            if mimetype == 'text/plain':
+                markdown_str += f"```{html.unescape(data['text/plain'])}```"
+            elif mimetype == 'text/html':
+                markdown_str += f"<div>{html.unescape(data['text/html'])}</div>"
+            elif mimetype == 'text/markdown':
+                markdown_str += f"{html.unescape(data['text/markdown'])}"
+            elif mimetype == 'image/png':
+                markdown_str += f"![Image](data:image/png;base64,{data['image/png']})"
+            elif mimetype == 'image/jpeg':
+                markdown_str += f"![Image](data:image/jpeg;base64,{data['image/jpeg']})"
+    # 处理错误输出
+    elif output['output_type'] == 'error':
+        error_traceback = '<br/>'.join(html.unescape(output['traceback']))
+        markdown_str += f"```{html.unescape(error_traceback)}```"
+    
+    return markdown_str
 
 class LibroExecution(BaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -29,6 +72,8 @@ class LibroExecution(BaseModel):
 
 class LibroNotebookClient(NotebookClient):
     execution: LibroExecution = LibroExecution()
+    iframe_url: str | None
+    upload_url: str | None
 
     def __init__(
         self,
@@ -37,6 +82,8 @@ class LibroNotebookClient(NotebookClient):
         args: dict | None = None,
         execute_result_path: str | None = None,
         execute_record_path: str | None = None,
+        iframe_url: str | None = None,
+        upload_url: str | None = None,
         **kw,
     ):
         super().__init__(nb=nb, km=km, **kw)
@@ -46,6 +93,8 @@ class LibroNotebookClient(NotebookClient):
             self.args = args
         self.execute_result_path = execute_result_path
         self.execute_record_path = execute_record_path
+        self.iframe_url = iframe_url
+        self.upload_url = upload_url
         self.start_time = None
         self.end_time = None
 
@@ -123,9 +172,13 @@ class LibroNotebookClient(NotebookClient):
                 self.execution.execute_record_path = self.execute_record_path
             self.execution.cell_count = len(self.nb.cells)
             for index, cell in enumerate(self.nb.cells):
-                await self.async_execute_cell(
-                    cell, index, execution_count=self.code_cells_executed + 1
-                )
+                try:
+                    await self.async_execute_cell(
+                        cell, index, execution_count=self.code_cells_executed + 1
+                    )
+                except Exception:
+                    print("execute Exception",Exception)
+                    
                 self.execution.current_index = index
                 self.execution.code_cells_executed = self.code_cells_executed
                 try:
@@ -149,3 +202,19 @@ class LibroNotebookClient(NotebookClient):
         return self.nb
 
     execute = run_sync(async_execute)
+
+    async def async_execute_to_md(
+        self, reset_kc: bool = False, **kwargs: Any
+    ) -> str:
+        notebook = await self.async_execute(reset_kc,**kwargs)
+        # 遍历每个cell，提取output并转成Markdown格式
+        markdown_outputs = []
+        for cell in notebook['cells']:
+            if cell['cell_type'] == 'code' and 'outputs' in cell:
+                for output in cell['outputs']:
+                    markdown_outputs.append(convert_output_to_markdown(output))
+        
+        # 将所有输出拼接成一个Markdown字符串
+        return '<br/>'.join(markdown_outputs)
+    
+    execute_to_markdown = run_sync(async_execute_to_md)
