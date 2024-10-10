@@ -59,7 +59,7 @@ def preprocessing_cell(cell, local_ns):
 class SQLMagic(Magics):
     """
     %%prompt
-    {"result_variable":"custom_variable_name","sql_script":"SELECT 1"}
+    {"result_variable":"custom_variable_name","sql_script":"SELECT 1","db_id":"xxxx"}
     """
 
     def __init__(self, shell=None):
@@ -75,11 +75,14 @@ class SQLMagic(Magics):
 
         result_variable: str = args.get("result_variable")
         sql_script: str = args.get("sql_script")
+        db_id: str = args.get("db_id")
 
         if sql_script is None or sql_script == "":
             raise Exception("Invalid sql script!")
+        if db_id is None or db_id == "":
+            raise Exception("Invalid db id!")
 
-        res = db.execute(sql_script)
+        res = db.execute(sql_script,db_id)
 
         # Set variable
         try:
