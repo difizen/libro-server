@@ -1,11 +1,11 @@
 [project]
-name = "libro"
-version = "0.1.14"
+name = "libro-server"
+version = "0.1.1"
 description = "Libro notebook editor"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
     { name = "brokun", email = "brokun0128@gmail.com" },
-    { name = "sunshinesmilelk", email= "1176136681@qq.com"},
+    { name = "sunshinesmilelk", email= "ximo.lk66@gmail.com"},
 ]
 dependencies = [
     "jupyter-server>=2.13.0",
@@ -14,9 +14,7 @@ dependencies = [
     "ipython>=7.34.0",
     "jupyter-lsp>=2.2.4",
     "ruff-lsp>=0.0.53",
-    "libro-core>=0.1.1",
-    "libro-sql>=0.1.5",
-    "libro-ai>=0.1.4",
+    "libro-core>=0.1.1"
 ]
 readme = "README.md"
 requires-python = ">=3.8.1"
