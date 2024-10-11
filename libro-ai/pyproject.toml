@@ -1,6 +1,6 @@
 [project]
 name = "libro-ai"
-version = "0.1.4"
+version = "0.1.5"
 description = "libro ai"
 authors = [
     { name = "brokun", email = "brokun0128@gmail.com" },
@@ -14,6 +14,8 @@ dependencies = [
     "requests>=2.31.0",
     "nbclient>=0.10.0",
     "libro-core>=0.1.1",
+    "langchain-community>=0.3.2",
+    "langchain_openai>=0.2.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
