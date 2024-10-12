@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
-import uuid
 from libro_core.config import libro_config
 
 class DatabaseConfig(BaseModel):
@@ -22,7 +21,7 @@ class Database:
 
     def __init__(self, config: DatabaseConfig):
         self.config = config
-        self.id = str(uuid.uuid4())
+        self.id = config.db_type + ': ' + config.database
         self.engine = self._create_engine()
 
     def _create_engine(self):
