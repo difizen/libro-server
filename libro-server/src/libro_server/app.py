@@ -84,13 +84,3 @@ class LibroApp(LabServerApp):
             ]
         )
         add_handlers(self.handlers, self)
-
-
-# -----------------------------------------------------------------------------
-# Main entry point
-# -----------------------------------------------------------------------------
-
-main = launch_new_instance = LibroApp.launch_instance
-
-if __name__ == "__main__":
-    main()
