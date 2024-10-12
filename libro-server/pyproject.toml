@@ -20,7 +20,7 @@ readme = "README.md"
 requires-python = ">=3.8.1"
 
 [project.scripts]
-libro = 'libro_server.app:launch_new_instance'
+libro = 'libro_server.entrypoint:main'
 
 [build-system]
 requires = ["hatchling"]
