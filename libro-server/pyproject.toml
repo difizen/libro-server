@@ -1,7 +1,7 @@
 [project]
 name = "libro-server"
 version = "0.1.1"
-description = "Libro notebook editor"
+description = "libro server"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
     { name = "brokun", email = "brokun0128@gmail.com" },
