@@ -12,6 +12,6 @@ def main():
             else:
                 print("Unknown config command. Available: generate")
         else:
-            print(f"Unknown command: {command}")
+            LibroApp.launch_instance()
     else:
         LibroApp.launch_instance()
