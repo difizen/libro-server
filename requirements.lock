@@ -6,14 +6,19 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
-#   generate-hashes: false
 
--e file:libro-server
+-e file:libro
 -e file:libro-ai
+    # via libro
 -e file:libro-core
+    # via libro-ai
+    # via libro-server
     # via libro-sql
 -e file:libro-flow
+-e file:libro-server
+    # via libro
 -e file:libro-sql
+    # via libro
 aiohttp==3.9.3
     # via langchain
     # via langchain-community
@@ -22,7 +27,9 @@ aiosignal==1.3.1
 annotated-types==0.6.0
     # via pydantic
 anyio==4.3.0
+    # via httpx
     # via jupyter-server
+    # via openai
 appnope==0.1.4
     # via ipykernel
 argon2-cffi==23.1.0
@@ -52,6 +59,8 @@ cattrs==23.2.3
     # via lsprotocol
     # via pygls
 certifi==2024.2.2
+    # via httpcore
+    # via httpx
     # via requests
 cffi==1.16.0
     # via argon2-cffi-bindings
@@ -65,7 +74,6 @@ contourpy==1.2.1
 cycler==0.12.1
     # via matplotlib
 dataclasses-json==0.6.4
-    # via langchain
     # via langchain-community
 debugpy==1.8.1
     # via ipykernel
@@ -73,6 +81,8 @@ decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
+distro==1.9.0
+    # via openai
 exceptiongroup==1.2.0
     # via anyio
     # via cattrs
@@ -88,18 +98,26 @@ fqdn==1.5.1
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
+h11==0.14.0
+    # via httpcore
+httpcore==1.0.6
+    # via httpx
+httpx==0.27.2
+    # via langsmith
+    # via openai
 idna==3.6
     # via anyio
+    # via httpx
     # via jsonschema
     # via requests
     # via yarl
 ipykernel==6.29.4
-    # via libro
+    # via libro-server
 ipython==8.23.0
     # via ipykernel
     # via ipywidgets
-    # via libro
     # via libro-ai
+    # via libro-server
     # via libro-sql
 ipywidgets==8.1.2
     # via libro-flow
@@ -111,10 +129,11 @@ jinja2==3.1.3
     # via jupyter-server
     # via jupyterlab-server
     # via nbconvert
+jiter==0.6.1
+    # via openai
 json5==0.9.24
     # via jupyterlab-server
 jsonpatch==1.33
-    # via langchain
     # via langchain-core
 jsonpointer==2.4
     # via jsonpatch
@@ -140,32 +159,36 @@ jupyter-core==5.7.2
 jupyter-events==0.10.0
     # via jupyter-server
 jupyter-lsp==2.2.4
-    # via libro
+    # via libro-server
 jupyter-server==2.13.0
     # via jupyter-lsp
     # via jupyterlab-server
-    # via libro
+    # via libro-server
 jupyter-server-terminals==0.5.3
     # via jupyter-server
 jupyterlab-pygments==0.3.0
     # via nbconvert
 jupyterlab-server==2.25.4
-    # via libro
+    # via libro-server
 jupyterlab-widgets==3.0.10
     # via ipywidgets
 kiwisolver==1.4.5
     # via matplotlib
-langchain==0.1.14
+langchain==0.3.3
+    # via langchain-community
     # via libro-ai
-langchain-community==0.0.31
-    # via langchain
-langchain-core==0.1.40
+langchain-community==0.3.2
+    # via libro-ai
+langchain-core==0.3.10
     # via langchain
     # via langchain-community
+    # via langchain-openai
     # via langchain-text-splitters
-langchain-text-splitters==0.0.1
+langchain-openai==0.2.2
+    # via libro-ai
+langchain-text-splitters==0.3.0
     # via langchain
-langsmith==0.1.40
+langsmith==0.1.135
     # via langchain
     # via langchain-community
     # via langchain-core
@@ -207,6 +230,8 @@ numpy==1.26.4
     # via langchain-community
     # via matplotlib
     # via pandas
+openai==1.51.2
+    # via langchain-openai
 orjson==3.10.0
     # via langsmith
 overrides==7.7.0
@@ -254,8 +279,12 @@ pydantic==2.9.1
     # via libro-ai
     # via libro-flow
     # via libro-sql
+    # via openai
+    # via pydantic-settings
 pydantic-core==2.23.3
     # via pydantic
+pydantic-settings==2.5.2
+    # via langchain-community
 pygls==1.3.1
     # via ruff-lsp
 pygments==2.17.2
@@ -270,6 +299,8 @@ python-dateutil==2.9.0.post0
     # via jupyter-client
     # via matplotlib
     # via pandas
+python-dotenv==1.0.1
+    # via pydantic-settings
 python-json-logger==2.0.7
     # via jupyter-events
 pytz==2024.2
@@ -288,12 +319,18 @@ referencing==0.34.0
     # via jsonschema
     # via jsonschema-specifications
     # via jupyter-events
+regex==2024.9.11
+    # via tiktoken
 requests==2.31.0
     # via jupyterlab-server
     # via langchain
     # via langchain-community
     # via langsmith
     # via libro-ai
+    # via requests-toolbelt
+    # via tiktoken
+requests-toolbelt==1.0.0
+    # via langsmith
 rfc3339-validator==0.1.4
     # via jsonschema
     # via jupyter-events
@@ -306,7 +343,7 @@ rpds-py==0.18.0
 ruff==0.3.5
     # via ruff-lsp
 ruff-lsp==0.0.53
-    # via libro
+    # via libro-server
 send2trash==1.8.3
     # via jupyter-server
 six==1.16.0
@@ -316,6 +353,8 @@ six==1.16.0
     # via rfc3339-validator
 sniffio==1.3.1
     # via anyio
+    # via httpx
+    # via openai
 soupsieve==2.5
     # via beautifulsoup4
 sqlalchemy==2.0.34
@@ -331,6 +370,8 @@ tenacity==8.2.3
 terminado==0.18.1
     # via jupyter-server
     # via jupyter-server-terminals
+tiktoken==0.8.0
+    # via langchain-openai
 tinycss2==1.2.1
     # via nbconvert
 tornado==6.4
@@ -338,6 +379,8 @@ tornado==6.4
     # via jupyter-client
     # via jupyter-server
     # via terminado
+tqdm==4.66.5
+    # via openai
 traitlets==5.14.2
     # via comm
     # via ipykernel
@@ -357,6 +400,8 @@ typing-extensions==4.11.0
     # via anyio
     # via cattrs
     # via ipython
+    # via langchain-core
+    # via openai
     # via pydantic
     # via pydantic-core
     # via ruff-lsp

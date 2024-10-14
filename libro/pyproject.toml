@@ -7,11 +7,7 @@ authors = [
     { name = "sunshinesmilelk", email = "ximo.lk66@gmail.com" },
     { name = "zhanba", email = "c5e1856@gmail.com" },
 ]
-dependencies = [
-    "libro-server>=0.1.3",
-    "libro-sql>=0.1.7",
-    "libro-ai>=0.1.7",
-]
+dependencies = ["libro-server>=0.1.3", "libro-sql>=0.1.7", "libro-ai>=0.1.7"]
 dev-dependencies = []
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -25,6 +21,9 @@ managed = true
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.version]
+path = "src/libro/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/libro"]
