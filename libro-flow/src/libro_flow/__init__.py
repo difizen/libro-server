@@ -1,3 +1,4 @@
+from ._version import __version__
 import jupyter_server.serverapp
 from .libro_execution import (
     notebook_args,
@@ -9,6 +10,7 @@ from .libro_execution import (
 )
 from .libro_client import LibroNotebookClient
 from .execution_handler import LibroExecutionHandler
+
 
 def _load_jupyter_server_extension(serverapp: jupyter_server.serverapp.ServerApp):
     """
