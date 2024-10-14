@@ -9,4 +9,4 @@ dependencies = [
 virtual = true
 
 [tool.rye.workspace]
-members = ["libro-*"]
+members = ["libro*"]
