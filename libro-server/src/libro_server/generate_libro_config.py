@@ -9,6 +9,10 @@ def generate_libro_config():
     # 如果目录不存在，创建目录
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
+    
+    if os.path.exists(config_file):
+        print("Libro config file has already existed")
+        return
 
     # 定义完全注释掉的 YAML 文件内容
     config_content = """
