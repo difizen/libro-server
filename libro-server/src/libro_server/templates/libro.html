@@ -21,9 +21,9 @@
       /* Remove token from URL. */
       (function () {
         var parsedUrl = new URL(window.location.href);
-        if (parsedUrl.searchParams.get("token")) {
-          parsedUrl.searchParams.delete("token");
-          window.history.replaceState({}, "", parsedUrl.href);
+        if (parsedUrl.searchParams.get('token')) {
+          parsedUrl.searchParams.delete('token');
+          window.history.replaceState({}, '', parsedUrl.href);
         }
       })();
     </script>
@@ -34,7 +34,7 @@
     </div>
 
     <script
-      src="{{static_url('umi.js')}}"
+      src="{{page_config.static_js_entry}}"
       type="text/javascript"
       charset="utf-8"
     ></script>
