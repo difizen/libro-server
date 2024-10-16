@@ -4,6 +4,7 @@ export default defineConfig({
   publicPath: '/',
   routes: routes,
   runtimePublicPath: {},
+  hash: true,
   proxy: {
     '/libro/api': {
       target: 'http://localhost:8888/',

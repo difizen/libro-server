@@ -1,4 +1,7 @@
 import json
+import os
+import re
+from typing import cast
 from jupyter_server.base.handlers import JupyterHandler, APIHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerMixin,
@@ -33,12 +36,36 @@ class ErrorHandler(BaseTemplateHandler):
 class LibroLabHandler(LabHandler):
     """Render the JupyterLab View."""
 
+    @property
+    def static_js_entry(self) -> str:
+        # Get the current file's directory
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        # Define the path to the 'static' directory
+        static_directory = os.path.join(current_directory, 'static')
+
+        # Define the regex pattern for matching filenames
+        pattern = re.compile(r'^umi\.[a-f0-9]{8}\.js$')
+
+        # List to store matching filenames
+        matching_files = []
+
+        # Check if the static directory exists
+        if os.path.exists(static_directory) and os.path.isdir(static_directory):
+            # Iterate over files in the static directory
+            for filename in os.listdir(static_directory):
+                # Match the file pattern
+                if pattern.match(filename):
+                    return self.static_url(filename, include_version=False)
+
+        return self.static_url('umi.js')
+
     @web.authenticated
     @web.removeslash
     def get(self, mode=None, workspace=None, tree=None) -> None:
         """Get the JupyterLab html page."""
         workspace = (
-            "default" if workspace is None else workspace.replace("/workspaces/", "")
+            "default" if workspace is None else workspace.replace(
+                "/workspaces/", "")
         )
         tree_path = "" if tree is None else tree.replace("/tree/", "")
 
@@ -52,6 +79,7 @@ class LibroLabHandler(LabHandler):
 
         page_config["workspace"] = workspace
         page_config["treePath"] = tree_path
+        page_config['static_js_entry'] = self.static_js_entry
 
         # Write the template with the config.
         tpl = self.render_template(
