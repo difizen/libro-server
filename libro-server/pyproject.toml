@@ -35,6 +35,7 @@ dev = "libro --config=./src/dev-config/jupyter_server_config.py --debug"
 lab = "jupyter lab --config=./dev-config/jupyter_server_config.py --debug"
 gateway = 'jupyter lab --config=./dev-config/jupyter_server_config.py --debug --gateway-url=http://127.0.0.1:8888'
 version = 'libro --version'
+help = 'libro --help'
 
 [tool.hatch.metadata]
 allow-direct-references = true

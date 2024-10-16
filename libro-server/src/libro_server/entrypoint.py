@@ -9,8 +9,17 @@ from ._version import __version__
 def main():
     parser = argparse.ArgumentParser(description="libro cli")
     parser.add_argument('--version', action='store_true',
-                        help='show the versions of core libro packages and exit')
-    args = parser.parse_args()
+                        help='show the versions of core abc packages and exit')
+    # 创建子命令解析器
+    subparsers = parser.add_subparsers(dest='command')
+
+    # 添加 'config' 子命令
+    config_parser = subparsers.add_parser('config', help='libro config related commands')
+
+    # 为 'config' 子命令添加子命令 'generate'
+    config_parser.add_argument('action', choices=['generate'], help='Action to perform on config')
+
+    args, unknown_args = parser.parse_known_args()
     if args.version:
         for package in [
             "libro",
@@ -31,14 +40,11 @@ def main():
             print(f"{package:<17}:", version)
         return
 
-    if len(sys.argv) > 1:
-        command = sys.argv[1]
-        if command == "config":
-            if len(sys.argv) > 2 and sys.argv[2] == "generate":
-                launch_generate_libro_config()
-            else:
-                print("Unknown config command. Available: generate")
+    # 处理子命令 'config'
+    if args.command == 'config':
+        if args.action == 'generate':
+            launch_generate_libro_config()
         else:
-            LibroApp.launch_instance()
+            print("Unknown config command. Available: generate")
     else:
         LibroApp.launch_instance()
