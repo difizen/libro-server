@@ -18,7 +18,7 @@
     "setup": "umi setup",
     "start": "umi dev",
     "clean": "git clean -fX .",
-    "deploy": "copyfiles -u 1 dist/* ../libro-server/src/libro_server/static/ && copyfiles -u 1 dist/**/* ../libro-server/src/libro_server/static/"
+    "deploy": "rm -rf ../libro-server/src/libro_server/static/* && copyfiles -u 1 dist/* ../libro-server/src/libro_server/static/ && copyfiles -u 1 dist/**/* ../libro-server/src/libro_server/static/"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
