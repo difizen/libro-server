@@ -1,6 +1,6 @@
 
 from typing import Dict
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, model_validator
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
@@ -8,27 +8,29 @@ from libro_core.config import libro_config
 
 class DatabaseConfig(BaseModel):
     db_type: str
-    username: str | None = None  # 可选字段
-    password: str | None = None  # 可选字段
-    host: str | None = None  # 可选字段
-    port: int | None = None  # 可选字段
+    username: str = None
+    password: str = None
+    host: str = None
+    port: int = None
     database: str
-    
-    @field_validator('database', mode='before')
-    def validate_database(cls, v, values):
-        db_type = values.get('db_type')
-        if db_type in ['postgresql', 'mysql','sqlite'] and not v:
-            raise ValueError('database must be provided.')
-        return v
 
-    @field_validator('username', 'password', 'host', 'port', mode='before')
-    def validate_fields(cls, v, values, field):
+    @model_validator(mode="before")
+    def validate_fields(cls, values):
         db_type = values.get('db_type')
+        
+        # 如果 db_type 是 'postgresql' 或 'mysql'，则这些字段为必填
         if db_type in ['postgresql', 'mysql']:
-            if v is None:
-                raise ValueError(f'{field.name} must be provided when db_type is {db_type}')
-            # 对于sqlite，不需要验证其他字段
-        return v
+            required_fields = ['username', 'password', 'host', 'port']
+            for field in required_fields:
+                if values.get(field) is None:
+                    raise ValueError(f'{field} must be provided when db_type is {db_type}')
+        
+        # 如果 db_type 是 'sqlite'，则只验证 database 字段
+        elif db_type == 'sqlite':
+            if not values.get('database'):
+                raise ValueError('database must be provided when db_type is sqlite')
+        
+        return values
 
 class Database:
     config: DatabaseConfig
