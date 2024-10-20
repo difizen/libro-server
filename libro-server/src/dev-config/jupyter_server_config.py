@@ -344,6 +344,7 @@ c.ServerApp.jpserver_extensions = {
     "libro_server": True,
     "jupyter_lsp": True,
     "libro_flow": True,
+    "libro_ai": True
 }
 
 # The kernel manager class to use.
@@ -430,7 +431,7 @@ c.ServerApp.jpserver_extensions = {
 
 # Whether to open in a browser after starting.
 #                          The specific browser used is platform dependent and
-#                          determined by the python standard library `webbrowser`
+#                          determined by the python standard library `webbrowser`extension
 #                          module, unless it is overridden using the --browser
 #                          (ServerApp.browser) configuration option.
 #  Default: False
