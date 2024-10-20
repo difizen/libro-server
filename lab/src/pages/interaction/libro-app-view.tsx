@@ -19,6 +19,7 @@ import {
   ExecutableCellView,
   LibroJupyterView,
   LibroService,
+  ServerConnection,
 } from '@difizen/libro-jupyter';
 import { FC, ReactNode, forwardRef, memo, useCallback, useRef } from 'react';
 import { BackTop, Button } from 'antd';
@@ -26,6 +27,7 @@ import { ToTopOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 import { AppCellContainer } from './default-dnd-content.js';
 import { DndCellItemRender } from './dnd-cell-item-render.js';
+import React from 'react';
 
 export const DndCellRender: FC<DndContentProps> = memo(function DndCellRender({
   cell,
@@ -144,6 +146,14 @@ export const LibroAppComponent = memo(function LibroAppComponent() {
       onScroll={handleScroll}
       ref={libroViewContentRef}
     >
+      <Button onClick={()=>{
+      appInstance.serverConnection.makeRequest(
+        `${appInstance.serverConnection.settings.baseUrl}libro/api/ai/chatstream`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ test:'asd' }),
+        },
+      );      }}></Button>
       <div className="libro-view-content-left" ref={libroViewLeftContentRef}>
         <div className="libro-dnd-list-container">
           <DndCellsRender libroView={instance} addCellButtons={null} />
@@ -167,6 +177,8 @@ export class LibroAppView extends BaseView {
   dndContentRender: FC<DndContentProps> = AppCellContainer;
   dndItemRender = DndCellItemRender;
   declare uri: URI;
+
+  @inject(ServerConnection) serverConnection: ServerConnection;
 
   @prop() libroView?: LibroView;
 

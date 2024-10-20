@@ -34,9 +34,6 @@ class OpenAIChat(LLMChat):
             chat = self.chat
             with get_openai_callback() as cb:
                 result = chat.invoke(value, **kwargs)
-                # print(f"Total Tokens: {cb.total_tokens}")
-                # print(f"Prompt Tokens: {cb.prompt_tokens}")
-                # print(f"Completion Tokens: {cb.completion_tokens}")
                 return result
             # result = chat.invoke(value,**kwargs)
             # return result
