@@ -6,8 +6,7 @@ import './index.less';
 import { LibroPromptScript } from './prompt-script.js';
 import { PromptScript } from '@difizen/libro-prompt-cell';
 import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
-import { LibroTestCommandContribution } from './libro-test-command-contribution.js'
-import React from 'react';
+import { LibroTestCommandContribution } from './test-command-contribution.js'
 
 const BaseModule = ManaModule.create().register(LibroApp, LibroTestCommandContribution,{
   token: PromptScript,
