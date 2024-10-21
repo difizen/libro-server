@@ -3,6 +3,7 @@ from jupyter_server.base.handlers import APIHandler
 from libro_ai.chat import chat_object_manager
 from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
+from langchain.prompts import PromptTemplate
 
 class LibroChatHandler(APIHandler):
     @authenticated
@@ -28,9 +29,11 @@ class LibroChatHandler(APIHandler):
         if chat_key in dict:
             object = dict.get(chat_key)
             if object:
+                template = PromptTemplate.from_template(prompt)
+                formattedPrompt = template.invoke({})
                 executor = object.to_executor()
                 # Use langchain prompt to support prompt templates and other features
-                res = executor.run(prompt)
+                res = executor.run(formattedPrompt)
                 response_data = {
                     "res": res.content
                 }    
@@ -63,10 +66,12 @@ class LibroChatStreamHandler(APIHandler):
             object = dict.get(chat_key)
             if object:
                 executor = object.to_executor()
+            template = PromptTemplate.from_template(prompt)
+            formattedPrompt = template.invoke({})
             # 生成流式响应
             final_result = ""
             try:
-                for chunk in executor.run(prompt,stream=True):
+                for chunk in executor.run(formattedPrompt,stream=True):
                     self.write("event: chunk\n")
                     self.write(f"data: {chunk}\n\n")  # 发送 SSE 格式的数据
                     self.flush()  # 确保数据及时发送
