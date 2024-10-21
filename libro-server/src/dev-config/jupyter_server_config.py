@@ -344,7 +344,6 @@ c.ServerApp.jpserver_extensions = {
     "libro_server": True,
     "jupyter_lsp": True,
     "libro_flow": True,
-    "libro_ai": True
 }
 
 # The kernel manager class to use.
