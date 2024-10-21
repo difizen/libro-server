@@ -61,14 +61,14 @@ export class LibroTestCommandContribution implements CommandContribution,Toolbar
           const res = await axios.post(
             `${this.serverConnection.settings.baseUrl}libro/api/chat`,
             {
-              chat_key:"LLM:gpt4",
-              prompt: "你是谁？",
+              chat_key:"LLM:debug-gpt4",
+              prompt: "代码为:\nplt.figure(figsize=(8, 6))\nplt.plot(df['A'], label='A')\nplt.plot(df['B'], label='B')\nplt.plot(df['C'], label='C')\nplt.title('Random Data Line Plot')\nplt.xlabel('Index')\nplt.ylabel('Value')\nplt.legend()\nplt.grid(True)\n# 显示图形\nplt.show()\n------\n报错为:\nNameError: name 'plt' is not defined",
             },
           );
           try {
             const response = await axios.post<ReadableStream<Uint8Array>>(`${this.serverConnection.settings.baseUrl}libro/api/chatstream`,             {
-              chat_key:"LLM:gpt4",
-              prompt: "你是谁？",
+              chat_key:"LLM:debug-gpt4",
+              prompt: "代码为:\nplt.figure(figsize=(8, 6))\nplt.plot(df['A'], label='A')\nplt.plot(df['B'], label='B')\nplt.plot(df['C'], label='C')\nplt.title('Random Data Line Plot')\nplt.xlabel('Index')\nplt.ylabel('Value')\nplt.legend()\nplt.grid(True)\n# 显示图形\nplt.show()\n------\n报错为:\nNameError: name 'plt' is not defined",
             }, {
                 headers: {
                     Accept: 'text/event-stream',
