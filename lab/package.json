@@ -30,7 +30,9 @@
     "@rjsf/utils": "^5.20.1",
     "@rjsf/validator-ajv8": "^5.18.2",
     "antd": "^5.16.2",
+    "axios": "^1.7.7",
     "dayjs": "^1.11.10",
+    "eventsource-parser": "^1.1.2",
     "umi": "^4.1.1"
   },
   "devDependencies": {

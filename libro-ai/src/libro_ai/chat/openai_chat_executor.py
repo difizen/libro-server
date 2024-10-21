@@ -25,20 +25,33 @@ class OpenAIChat(LLMChat):
             return True
         return False
 
-    def run(self, value, **kwargs):
+    def run(self, value, stream = False,**kwargs):
         if not self.chat:
             self.load()
-        try:
-            if not self.chat:
-                raise Exception("Chat model not loaded")
-            chat = self.chat
-            with get_openai_callback() as cb:
-                result = chat.invoke(value, **kwargs)
-                return result
-            # result = chat.invoke(value,**kwargs)
-            # return result
-        except Exception as e:
-            return ""
+        if stream:
+            try:
+                if not self.chat:
+                    raise Exception("Chat model not loaded")
+                chat = self.chat
+                with get_openai_callback() as cb:
+                    result = chat.stream(value, **kwargs)
+                    return result
+                # result = chat.invoke(value,**kwargs)
+                # return result
+            except Exception as e:
+                return ""
+        else:
+            try:
+                if not self.chat:
+                    raise Exception("Chat model not loaded")
+                chat = self.chat
+                with get_openai_callback() as cb:
+                    result = chat.invoke(value, **kwargs)
+                    return result
+                # result = chat.invoke(value,**kwargs)
+                # return result
+            except Exception as e:
+                return ""
 
     def display(self, value, **kwargs):
         if isinstance(value, str):
