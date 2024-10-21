@@ -1,9 +1,12 @@
 import json
 from jupyter_server.base.handlers import APIHandler
 from libro_ai.chat import chat_object_manager
-from tornado.web import HTTPError
+from jupyter_server.auth.decorator import allow_unauthenticated
+from tornado.web import HTTPError, authenticated
 
 class LibroChatHandler(APIHandler):
+    @authenticated
+    @allow_unauthenticated
     async def post(self):
         response_data = {
         }
@@ -34,6 +37,8 @@ class LibroChatHandler(APIHandler):
         self.finish(json.dumps(response_data))
 
 class LibroChatStreamHandler(APIHandler):
+    @authenticated
+    @allow_unauthenticated
     async def post(self):
         # 获取 POST 请求中的 JSON 数据
         model = self.get_json_body()
@@ -60,7 +65,6 @@ class LibroChatStreamHandler(APIHandler):
                 executor = object.to_executor()
             # 生成流式响应
             final_result = ""
-
             try:
                 for chunk in executor.run(prompt,stream=True):
                     self.write("event: chunk\n")
