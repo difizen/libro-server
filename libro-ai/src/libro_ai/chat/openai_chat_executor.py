@@ -9,6 +9,7 @@ from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from IPython.display import display
 from libro_core.config import libro_config
 
+
 class OpenAIChat(LLMChat):
     name: str = "chatgpt"
     model: str = Field(default="gpt-3.5-turbo")
@@ -21,11 +22,11 @@ class OpenAIChat(LLMChat):
             if libro_ai_config is not None:
                 if api_key := libro_ai_config.get("OPENAI_API_KEY"):
                     extra_params["api_key"] = api_key
-            self.chat = ChatOpenAI(model_name=self.model,**extra_params)
+            self.chat = ChatOpenAI(model_name=self.model, **extra_params)
             return True
         return False
 
-    def run(self, value, stream = False,**kwargs):
+    def run(self, value, stream=False, sync=True, **kwargs):
         if not self.chat:
             self.load()
         if stream:
@@ -34,8 +35,13 @@ class OpenAIChat(LLMChat):
                     raise Exception("Chat model not loaded")
                 chat = self.chat
                 with get_openai_callback() as cb:
-                    result = chat.stream(value, **kwargs)
-                    return result
+                    if sync:
+                        result = chat.stream(value, **kwargs)
+                        return result
+                    else:
+                        result = chat.astream(value, **kwargs)
+                        return result
+
                 # result = chat.invoke(value,**kwargs)
                 # return result
             except Exception as e:
