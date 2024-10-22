@@ -1,13 +1,24 @@
 import json
+import time
 from jupyter_server.base.handlers import APIHandler
+from jupyter_server.auth.decorator import allow_unauthenticated
 from libro_ai.chat import chat_object_manager
 from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
 from langchain.prompts import PromptTemplate
 
+
+import tornado
+from tornado.web import HTTPError
+from tornado import gen
+from tornado.iostream import StreamClosedError
+
+
 class LibroChatHandler(APIHandler):
-    @authenticated
     @allow_unauthenticated
+    def options(self) -> None:
+        self.finish({})
+
     async def post(self):
         response_data = {
         }
@@ -36,13 +47,26 @@ class LibroChatHandler(APIHandler):
                 res = executor.run(formattedPrompt)
                 response_data = {
                     "res": res.content
-                }    
+                }
         self.finish(json.dumps(response_data))
 
+
 class LibroChatStreamHandler(APIHandler):
-    @authenticated
     @allow_unauthenticated
-    async def post(self):
+    def options(self) -> None:
+        self.finish({})
+
+    @gen.coroutine
+    def publish(self, data):
+        """Pushes data to a listener."""
+        try:
+            self.write(data)
+            yield self.flush()
+        except StreamClosedError as e:
+            pass
+
+    @gen.coroutine
+    def post(self):
         # 获取 POST 请求中的 JSON 数据
         model = self.get_json_body()
         if model is None:
@@ -71,17 +95,29 @@ class LibroChatStreamHandler(APIHandler):
             # 生成流式响应
             final_result = ""
             try:
-                for chunk in executor.run(formattedPrompt,stream=True):
-                    self.write("event: chunk\n")
-                    self.write(f"data: {chunk}\n\n")  # 发送 SSE 格式的数据
-                    self.flush()  # 确保数据及时发送
-                    final_result += chunk.content
-                self.write("event: result\n")
-                self.write(f"data: {final_result}\n\n")  # 发送最终结果
-                self.flush()
-            except Exception as e:
-                self.write("event: error\n")
-                self.write(f"data: error: {str(e)}\n\n")
-                self.flush()
-            self.finish()
 
+                for chunk in executor.run(prompt, stream=True, sync=True):
+                    # Construct an event with data and event type
+                    event_id = int(time.time())  # Simple event ID
+                    event_type = "chunk"
+                    data = json.dumps({"output": chunk.content},
+                                      ensure_ascii=False)
+                    message = f"id: {event_id}\n"
+                    message += f"event: {event_type}\n"
+                    message += f"data: {data}\n\n"
+                    self.publish(message)
+                    final_result += chunk.content
+                    # yield tornado.gen.sleep(1)
+                event_id = int(time.time())  # Simple event ID
+                event_type = "result"
+                data = json.dumps({"output": final_result},
+                                  ensure_ascii=False)
+                message = f"id: {event_id}\n"
+                message += f"event: {event_type}\n"
+                message += f"data: {data}\n\n"
+                self.publish(message)
+            except Exception as e:
+                message = "event: error\n"
+                message += f"data: error: {str(e)}\n\n"
+                self.publish(message)
+            self.finish()
