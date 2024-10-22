@@ -16,6 +16,9 @@ requires-python = ">= 3.9"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.rye.scripts]
+dev = "libro --config=../libro-server/src/dev-config/jupyter_server_config.py --debug"
+
 [tool.rye]
 managed = true
 

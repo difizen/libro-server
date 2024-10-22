@@ -430,7 +430,7 @@ c.ServerApp.jpserver_extensions = {
 
 # Whether to open in a browser after starting.
 #                          The specific browser used is platform dependent and
-#                          determined by the python standard library `webbrowser`
+#                          determined by the python standard library `webbrowser`extension
 #                          module, unless it is overridden using the --browser
 #                          (ServerApp.browser) configuration option.
 #  Default: False

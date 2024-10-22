@@ -14,6 +14,7 @@ class ChatExecutor(BaseModel, ABC):
     def run(
         self,
         value,
+        stream = False,
         **kwargs,
     ) -> Any:
         """Chat and get result."""

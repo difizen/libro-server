@@ -74,7 +74,7 @@ class LibroApp(LabServerApp):
         """Initialize handlers."""
         # LIBRO_URL_PATTERN = (r"/(?P<libro>/libro/.*)?")
         # url_pattern = LIBRO_URL_PATTERN.format(self.app_url.replace("/", ""))
-
+        super().initialize_handlers()
         self.handlers.extend(
             [
                 (rf"/{self.name}/api/workspace", LibroWorkspaceHandler),
@@ -83,4 +83,13 @@ class LibroApp(LabServerApp):
                 (rf"/{self.name}/?", LibroLabHandler),
             ]
         )
+        try:
+            from .libro_ai_handler import LibroChatHandler, LibroChatStreamHandler 
+            self.handlers.extend(
+                [   (rf"/libro/api/chat", LibroChatHandler),
+                    (rf"/libro/api/chatstream", LibroChatStreamHandler)
+                ]
+            )
+        except ImportError:
+            print('ImportError for libro-ai')
         add_handlers(self.handlers, self)
