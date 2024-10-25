@@ -30,6 +30,7 @@ class LibroChatHandler(APIHandler):
         if chat_key is None or chat_key == "":
             chat_key = model.get("model_name")
         prompt: str = model.get("prompt")
+        system_prompt: str = model.get("system_prompt")
         if (
             (chat_key is None or chat_key == "")
             or (prompt is None or prompt == "")
@@ -44,7 +45,7 @@ class LibroChatHandler(APIHandler):
                 formattedPrompt = template.invoke({})
                 executor = object.to_executor()
                 # Use langchain prompt to support prompt templates and other features
-                res = executor.run(formattedPrompt)
+                res = executor.run(formattedPrompt,sync = False,system_prompt = system_prompt)
                 response_data = {
                     "res": res.content
                 }
@@ -75,6 +76,7 @@ class LibroChatStreamHandler(APIHandler):
         if chat_key is None or chat_key == "":
             chat_key = model.get("model_name")
         prompt: str = model.get("prompt")
+        system_prompt: str = model.get("system_prompt")
         # 流式输出响应
         self.set_header('Content-Type', 'text/event-stream')
         self.set_header('Cache-Control', 'no-cache')
@@ -96,7 +98,7 @@ class LibroChatStreamHandler(APIHandler):
             final_result = ""
             try:
 
-                for chunk in executor.run(prompt, stream=True, sync=True):
+                for chunk in executor.run(formattedPrompt,stream=True, sync=False,system_prompt = system_prompt):
                     # Construct an event with data and event type
                     event_id = int(time.time())  # Simple event ID
                     event_type = "chunk"

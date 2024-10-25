@@ -27,7 +27,7 @@ class DebugChat(LLMChat):
             return True
         return False
 
-    def run(self, value:StringPromptValue, stream = False,**kwargs):
+    def run(self, value:StringPromptValue, stream = False,sync=True,system_prompt = None,**kwargs):
         if not self.chat:
             self.load()
         if stream:
@@ -37,8 +37,12 @@ class DebugChat(LLMChat):
                 chat = self.chat
                 human_message = HumanMessage(content=value.text)
                 with get_openai_callback() as cb:
-                    result = chat.stream([self.system_message,human_message], **kwargs)
-                    return result
+                    if sync:
+                        result = chat.stream([self.system_message,human_message], **kwargs)
+                        return result
+                    else:
+                        result = chat.astream([self.system_message,human_message], **kwargs)
+                        return result
             except Exception as e:
                 return ""
         else:
@@ -48,7 +52,10 @@ class DebugChat(LLMChat):
                 chat = self.chat
                 human_message = HumanMessage(content=value.text)
                 with get_openai_callback() as cb:
-                    result = chat.invoke([self.system_message,human_message], **kwargs)
+                    if sync:
+                        result = chat.invoke([self.system_message,human_message], **kwargs)
+                    else:
+                        result = chat.ainvoke([self.system_message,human_message], **kwargs)
                     return result.content
             except Exception as e:
                 return ""
