@@ -3,7 +3,8 @@ from pydantic import Field
 from .executor import LLMChat
 from ..utils import is_langchain_installed
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage,AIMessage
+from langchain_core.prompt_values import StringPromptValue
 from langchain.callbacks import get_openai_callback
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from IPython.display import display
@@ -26,9 +27,15 @@ class OpenAIChat(LLMChat):
             return True
         return False
 
-    def run(self, value, stream=False, sync=True, **kwargs):
+    def run(self, value:StringPromptValue,stream=False, sync=True, system_prompt = None, **kwargs):
         if not self.chat:
             self.load()
+        input = []
+        if system_prompt is None:
+            input = [HumanMessage(content=value.text)]
+        else:
+            input = [SystemMessage(content=system_prompt),HumanMessage(content=value.text)]
+        
         if stream:
             try:
                 if not self.chat:
@@ -36,14 +43,12 @@ class OpenAIChat(LLMChat):
                 chat = self.chat
                 with get_openai_callback() as cb:
                     if sync:
-                        result = chat.stream(value, **kwargs)
+                        result = chat.stream(input, **kwargs)
                         return result
                     else:
-                        result = chat.astream(value, **kwargs)
-                        return result
 
-                # result = chat.invoke(value,**kwargs)
-                # return result
+                        result = chat.astream(input, **kwargs)
+                        return result
             except Exception as e:
                 return ""
         else:
@@ -52,10 +57,12 @@ class OpenAIChat(LLMChat):
                     raise Exception("Chat model not loaded")
                 chat = self.chat
                 with get_openai_callback() as cb:
-                    result = chat.invoke(value, **kwargs)
-                    return result
-                # result = chat.invoke(value,**kwargs)
-                # return result
+                    if sync:
+                        result = chat.invoke(input, **kwargs)
+                        return result
+                    else:
+                        result = chat.ainvoke(input, **kwargs)
+                        return result
             except Exception as e:
                 return ""
 
