@@ -62,6 +62,7 @@ class LibroChatStreamHandler(APIHandler):
         try:
             self.write(data)
             yield self.flush()
+            yield gen.sleep(0)
         except StreamClosedError as e:
             pass
 
@@ -107,7 +108,6 @@ class LibroChatStreamHandler(APIHandler):
                     message += f"data: {data}\n\n"
                     self.publish(message)
                     final_result += chunk.content
-                    # yield tornado.gen.sleep(1)
                 event_id = int(time.time())  # Simple event ID
                 event_type = "result"
                 data = json.dumps({"output": final_result},
