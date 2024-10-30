@@ -23,17 +23,21 @@ class LibroChatHandler(APIHandler):
         response_data = {
         }
         # 获取 POST 请求中的 JSON 数据
-        model = self.get_json_body()
-        if model is None:
+        data = self.get_json_body()
+        if data is None:
             raise HTTPError(400, "can not get arguments")
-        chat_key: str = model.get("chat_key")
+        chat_key: str = data.get("chat_key")
         if chat_key is None or chat_key == "":
-            chat_key = model.get("model_name")
+            chat_key = data.get("model_name")
         config = libro_config.get_config().get('llm')
         if chat_key is None or chat_key == "":
-            chat_key = config.get("model")
-        prompt: str = model.get("prompt")
-        system_prompt: str = model.get("system_prompt")
+            if config is not None:
+                model = config.get("model")
+                model_type = config.get("model_type")
+                if model is not None and model_type is not None:
+                    chat_key = model_type + ":"+ model
+        prompt: str = data.get("prompt")
+        system_prompt: str = data.get("system_prompt")
         if (
             (chat_key is None or chat_key == "")
             or (prompt is None or prompt == "")
@@ -74,17 +78,21 @@ class LibroChatStreamHandler(APIHandler):
     @gen.coroutine
     def post(self):
         # 获取 POST 请求中的 JSON 数据
-        model = self.get_json_body()
-        if model is None:
+        data = self.get_json_body()
+        if data is None:
             raise HTTPError(400, "can not get arguments")
-        chat_key: str = model.get("chat_key")
+        chat_key: str = data.get("chat_key")
         if chat_key is None or chat_key == "":
-            chat_key = model.get("model_name")
+            chat_key = data.get("model_name")
         config = libro_config.get_config().get('llm')
         if chat_key is None or chat_key == "":
-            chat_key = config.get("model")
-        prompt: str = model.get("prompt")
-        system_prompt: str = model.get("system_prompt")
+            if config is not None:
+                model = config.get("model")
+                model_type = config.get("model_type")
+                if model is not None and model_type is not None:
+                    chat_key = model_type + ":"+ model
+        prompt: str = data.get("prompt")
+        system_prompt: str = data.get("system_prompt")
         # 流式输出响应
         self.set_header('Content-Type', 'text/event-stream')
         self.set_header('Cache-Control', 'no-cache')
