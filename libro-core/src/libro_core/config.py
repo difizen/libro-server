@@ -51,30 +51,30 @@ def load_config(config=default_config, project_root_path=None):
         logger.info(f"Load user config from {user_config_path}.")
         config = merge_dicts(config, user_config)
 
-    # 工作目录配置文件路径
-    if project_root_path is None:
-        project_root_path = os.getcwd()
+    # # 工作目录配置文件路径
+    # if project_root_path is None:
+    #     project_root_path = os.getcwd()
 
-    # 加载项目根目录配置文件
-    project_config_path = os.path.join(
-        project_root_path, 'config/libro_config.yaml')
-    if os.path.exists(project_config_path):
-        project_config = load_config_from_file(project_config_path)
-        logger.info(f"Load project config from {project_config_path}.")
-        config = merge_dicts(config, project_config)
+    # # 加载项目根目录配置文件
+    # project_config_path = os.path.join(
+    #     project_root_path, 'config/libro_config.yaml')
+    # if os.path.exists(project_config_path):
+    #     project_config = load_config_from_file(project_config_path)
+    #     logger.info(f"Load project config from {project_config_path}.")
+    #     config = merge_dicts(config, project_config)
 
-    project_root_config_path = os.path.join(
-        project_root_path, '.libro_config.yaml')
-    if os.path.exists(project_root_config_path):
-        project_config = load_config_from_file(project_root_config_path)
-        logger.info(f"Load project config from {project_config_path}.")
-        config = merge_dicts(config, project_config)
+    # project_root_config_path = os.path.join(
+    #     project_root_path, '.libro_config.yaml')
+    # if os.path.exists(project_root_config_path):
+    #     project_config = load_config_from_file(project_root_config_path)
+    #     logger.info(f"Load project config from {project_config_path}.")
+    #     config = merge_dicts(config, project_config)
 
-    # 加载环境变量配置
-    env_config = load_config_from_env(default_config)
-    if len(env_config.keys()):
-        logger.info("Load env config.")
-    config = merge_dicts(config, env_config)
+    # # 加载环境变量配置
+    # env_config = load_config_from_env(default_config)
+    # if len(env_config.keys()):
+    #     logger.info("Load env config.")
+    # config = merge_dicts(config, env_config)
 
     return config
 
