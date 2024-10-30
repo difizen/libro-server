@@ -1,3 +1,4 @@
+from .tongyi import TongyiChatObjectProvider
 from .debug_provider import DebugChatObjectProvider
 from .executor import LLMChat, ChatExecutor
 from .openai import OpenAIChatObjectProvider
@@ -10,6 +11,7 @@ from .utils import get_message_str
 
 chat_object_manager = ChatObjectManager()
 chat_object_manager.register_provider(OpenAIChatObjectProvider())
+chat_object_manager.register_provider(TongyiChatObjectProvider())
 chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
 chat_object_manager.register_provider(DebugChatObjectProvider())
 
