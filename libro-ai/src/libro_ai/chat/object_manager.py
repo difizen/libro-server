@@ -46,6 +46,7 @@ class ChatObjectManager(BaseModel):
         for provider in self.providers:
             if self.is_provider_blocked(provider):
                 continue
+            
             for item in provider.list():
                 key = item.key
                 exists = chat_objects.get(key)
