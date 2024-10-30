@@ -6,7 +6,7 @@ from libro_ai.chat import chat_object_manager
 from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
 from langchain.prompts import PromptTemplate
-
+from libro_core.config import libro_config
 
 import tornado
 from tornado.web import HTTPError
@@ -29,6 +29,9 @@ class LibroChatHandler(APIHandler):
         chat_key: str = model.get("chat_key")
         if chat_key is None or chat_key == "":
             chat_key = model.get("model_name")
+        config = libro_config.get_config().get('llm')
+        if chat_key is None or chat_key == "":
+            chat_key = config.get("model")
         prompt: str = model.get("prompt")
         system_prompt: str = model.get("system_prompt")
         if (
