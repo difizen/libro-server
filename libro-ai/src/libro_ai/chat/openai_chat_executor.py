@@ -15,14 +15,13 @@ class OpenAIChat(LLMChat):
     name: str = "chatgpt"
     model: str = Field(default="gpt-3.5-turbo")
     chat: ChatOpenAI = None
+    api_key: str = None
 
     def load(self):
         if is_langchain_installed():
             extra_params = {}
-            libro_ai_config = libro_config.get_config().get("llm")
-            if libro_ai_config is not None:
-                if api_key := libro_ai_config.get("OPENAI_API_KEY"):
-                    extra_params["api_key"] = api_key
+            if self.api_key:
+                extra_params["api_key"] = self.api_key
             self.chat = ChatOpenAI(model_name=self.model, **extra_params)
             return True
         return False
@@ -79,10 +78,14 @@ class DalleChat(LLMChat):
     name: str = "dalle-3"
     model: str = Field(default="dall-e-3")
     dalle: DallEAPIWrapper = None
+    api_key:str = None
 
     def load(self):
+        extra_params = {}
         if is_langchain_installed():
-            self.dalle = DallEAPIWrapper()
+            if self.api_key:
+                extra_params["api_key"] = self.api_key
+            self.dalle = DallEAPIWrapper(**extra_params)
             self.dalle.model_name = self.model
             return True
         return False

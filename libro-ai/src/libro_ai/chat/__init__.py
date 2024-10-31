@@ -1,19 +1,29 @@
-from .tongyi import TongyiChatObjectProvider
+from .tongyi_chat_provider import TongyiChatObjectProvider
 from .debug_provider import DebugChatObjectProvider
 from .executor import LLMChat, ChatExecutor
-from .openai import OpenAIChatObjectProvider
+from .openai_chat_provider import OpenAIChatObjectProvider
 from .object_manager import ChatObjectManager
 from .source import CHAT_SOURCE
 from .object import ChatObject, ChatObjectProvider
 from .langchain_variable import LangChainVariableChatObjectProvider
 from .chat_record import ChatMessage, ChatRecord, ChatRecordProvider
-from .utils import get_message_str
+from libro_core.config import libro_config
 
 chat_object_manager = ChatObjectManager()
-chat_object_manager.register_provider(OpenAIChatObjectProvider())
-chat_object_manager.register_provider(TongyiChatObjectProvider())
+libro_ai_config = libro_config.get_config().get("llm")
+model_type = []
+api_key:str = None
+if libro_ai_config is not None:
+    if tongyi_api_key := libro_ai_config.get("DASHSCOPE_API_KEY"):
+        api_key = tongyi_api_key
+        chat_object_manager.register_provider(TongyiChatObjectProvider(api_key = api_key))
+        model_type.append('tongyi')
+    if openai_api_key := libro_ai_config.get("OPENAI_API_KEY"):
+        api_key = openai_api_key
+        chat_object_manager.register_provider(OpenAIChatObjectProvider(api_key = api_key))
+        model_type.append('openai')
 chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
-chat_object_manager.register_provider(DebugChatObjectProvider())
+chat_object_manager.register_provider(DebugChatObjectProvider(model_type = model_type,api_key = api_key))
 
 chat_record_provider = ChatRecordProvider()
 
