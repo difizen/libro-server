@@ -32,10 +32,8 @@ class LibroChatHandler(APIHandler):
         config = libro_config.get_config().get('llm')
         if chat_key is None or chat_key == "":
             if config is not None:
-                model = config.get("model")
-                model_type = config.get("model_type")
-                if model is not None and model_type is not None:
-                    chat_key = model_type + ":"+ model
+                model = config.get("default_model")
+                chat_key = chat_object_manager.get_key(model)
         prompt: str = data.get("prompt")
         system_prompt: str = data.get("system_prompt")
         if (
@@ -87,10 +85,10 @@ class LibroChatStreamHandler(APIHandler):
         config = libro_config.get_config().get('llm')
         if chat_key is None or chat_key == "":
             if config is not None:
-                model = config.get("model")
-                model_type = config.get("model_type")
-                if model is not None and model_type is not None:
-                    chat_key = model_type + ":"+ model
+                model = config.get("default_model")
+                chat_key = chat_object_manager.get_key(model)
+                if chat_key is None:
+                    raise Exception("Invalid api key and default model!")
         prompt: str = data.get("prompt")
         system_prompt: str = data.get("system_prompt")
         # 流式输出响应

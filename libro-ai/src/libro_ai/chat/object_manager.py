@@ -4,7 +4,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 from .object import ChatObject, ChatObjectProvider
 from .executor import ChatExecutor
-
+from .utils import MODEL_NAME_ALIASES
 
 class ChatObjectManager(BaseModel):
     providers: List[ChatObjectProvider] = []
@@ -40,6 +40,15 @@ class ChatObjectManager(BaseModel):
                 self.executors[key] = executor
                 return executor
         raise Exception(f"Executor {key} not found")
+
+    def get_key(self, model_name: str):
+        dict = self.get_object_dict()
+        model_alias_name = MODEL_NAME_ALIASES.get(model_name)
+        if model_alias_name is not None:
+            for value in dict.values():
+                if value.name == model_alias_name:
+                    return value.key
+        return None
 
     def get_object_dict(self) -> Dict[str, ChatObject]:
         chat_objects: Dict[str, ChatObject] = {}

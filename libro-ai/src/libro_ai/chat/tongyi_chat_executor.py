@@ -13,14 +13,13 @@ class TongyiChat(LLMChat):
     name: str = "tongyi"
     model: str = Field(default="qwen-max")
     chat: ChatTongyi = None
+    api_key: str = None
 
     def load(self):
         if is_langchain_installed():
             extra_params = {}
-            libro_ai_config = libro_config.get_config().get("llm")
-            if libro_ai_config is not None:
-                if api_key := libro_ai_config.get("DASHSCOPE_API_KEY"):
-                    extra_params["api_key"] = api_key
+            if self.api_key:
+                extra_params["api_key"] = self.api_key
             self.chat = ChatTongyi(model_name=self.model, **extra_params)
             return True
         return False
@@ -47,6 +46,7 @@ class TongyiChat(LLMChat):
                     result = chat.astream(input, streaming = True, **kwargs)
                     return result
             except Exception as e:
+
                 return ""
         else:
             try:

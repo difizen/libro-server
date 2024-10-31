@@ -26,6 +26,7 @@ class ChatObject(BaseModel):
 class ChatObjectProvider(BaseModel, ABC):
     name: str = "custom"
     is_system_provider: bool = False
+    api_key: str = None
 
     @abstractmethod
     def list(self) -> List[ChatObject]:

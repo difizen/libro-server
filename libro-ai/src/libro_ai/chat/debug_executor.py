@@ -1,4 +1,6 @@
+from typing import List, Union
 from langchain_openai import ChatOpenAI
+from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain.callbacks import get_openai_callback
 from .executor import LLMChat
 from ..utils import is_langchain_installed
@@ -9,21 +11,32 @@ from IPython.display import display
 from libro_core.config import libro_config
 from pydantic import Field
 
+OPENAI = ['text-davinci-003',"gpt-4","gpt-4o","gpt-3.5-turbo"]
+TONGYI = ["qwen-max","qwen-plus","qwen-turbo"]
+
 class DebugChat(LLMChat):
     name: str = "debug"
     model: str = Field(default="gpt-4o")
-    system_message:SystemMessage = SystemMessage(content="你是一个代码调试小助手，在 notebook 执行时，输出了一些报错信息，请尝试解释报错并给出解决方案，每次对话都会给出代码以及报错信息")
-    chat: ChatOpenAI = None
+    system_message: SystemMessage = SystemMessage(content="你是一个代码调试小助手，在 notebook 执行时，输出了一些报错信息，请尝试解释报错并给出解决方案，每次对话都会给出代码以及报错信息")
+    chat: Union[ChatOpenAI, ChatTongyi] = None
+    api_key: str = None
+    model_type: List[str] = ['openai']
 
     def load(self):
         if is_langchain_installed():
             extra_params = {}
-            libro_ai_config = libro_config.get_config().get("llm")
-            if libro_ai_config is not None:
-                if api_key := libro_ai_config.get("OPENAI_API_KEY"):
-                    extra_params["api_key"] = api_key
-
-            self.chat = ChatOpenAI(model_name=self.model,**extra_params)
+            config = libro_config.get_config().get('llm')
+            if config is not None:
+                default_model = config.get("default_model")
+                self.model = default_model
+                if default_model in OPENAI:
+                    if api_key := config.get("OPENAI_API_KEY"):
+                        extra_params["api_key"] = api_key
+                        self.chat = ChatOpenAI(model_name=self.model,**extra_params)
+                elif default_model in TONGYI:
+                    if api_key := config.get("DASHSCOPE_API_KEY"):
+                        extra_params["api_key"] = api_key
+                        self.chat = ChatTongyi(model_name=self.model,**extra_params)
             return True
         return False
 

@@ -5,19 +5,7 @@ from .source import CHAT_SOURCE
 from .executor import ChatExecutor
 from .object import ChatObject, ChatObjectProvider
 from ..utils import is_langchain_installed
-
-MODEL_NAME_ALIASES = {
-    "qwen-max": "qwen-max",
-    "qwen-plus": "qwen-plus",
-    "qwen-turbo": "qwen-turbo",
-}
-
-ALIASE_NAME_MODEL = {
-    "qwen-max": "qwen-max",
-    "qwen-plus": "qwen-plus",
-    "qwen-turbo": "qwen-turbo",
-}
-
+from .utils import ALIASE_NAME_MODEL, MODEL_NAME_ALIASES
 
 class TongyiChatObjectProvider(ChatObjectProvider):
     name: str = "tongyi"
@@ -29,9 +17,9 @@ class TongyiChatObjectProvider(ChatObjectProvider):
         model = ALIASE_NAME_MODEL.get(name, name)
         if model in self.cache:
             return self.cache[model]
-        from .tongyi_executor import TongyiChat
+        from .tongyi_chat_executor import TongyiChat
 
-        executor = TongyiChat(model=model, name=name)
+        executor = TongyiChat(model=model, name=name,api_key=self.api_key)
         if executor.load():
             self.cache[model] = executor
         return executor
