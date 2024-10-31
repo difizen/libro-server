@@ -17,7 +17,7 @@ TONGYI = ["qwen-max","qwen-plus","qwen-turbo"]
 class DebugChat(LLMChat):
     name: str = "debug"
     model: str = Field(default="gpt-4o")
-    system_message: SystemMessage = SystemMessage(content="你是一个代码调试小助手，在 notebook 执行时，输出了一些报错信息，请尝试解释报错并给出解决方案，每次对话都会给出代码以及报错信息")
+    system_message: SystemMessage = SystemMessage(content="You are a code debugging assistant. When errors are encountered during notebook execution, you output some error messages. Please attempt to explain the error and provide a solution. Each conversation will include code and error messages. Please respond in the language type used in the input.")
     chat: Union[ChatOpenAI, ChatTongyi] = None
     api_key: str = None
     model_type: List[str] = ['openai']
@@ -43,10 +43,10 @@ class DebugChat(LLMChat):
     def run(self, value:StringPromptValue, language = None, stream = False,sync=True,system_prompt = None,**kwargs):
         if not self.chat:
             self.load()
-        if language == 'en-US':
-            self.system_message = SystemMessage(content="You are a code debugging assistant. When errors are encountered during notebook execution, you output some error messages. Please attempt to explain the error and provide a solution. Each conversation will include code and error messages. Please answer in English")
-        else:
-            self.system_message = SystemMessage(content="你是一个代码调试小助手，在 notebook 执行时，输出了一些报错信息，请尝试解释报错并给出解决方案，每次对话都会给出代码以及报错信息")
+        # if language == 'en-US':
+        #     self.system_message = SystemMessage(content="You are a code debugging assistant. When errors are encountered during notebook execution, you output some error messages. Please attempt to explain the error and provide a solution. Each conversation will include code and error messages. Please respond in the language type used in the input.")
+        # else:
+        #     self.system_message = SystemMessage(content="你是一个代码调试小助手，在 notebook 执行时，输出了一些报错信息，请尝试解释报错并给出解决方案，每次对话都会给出代码以及报错信息")
         if stream:
             try:
                 if not self.chat:
