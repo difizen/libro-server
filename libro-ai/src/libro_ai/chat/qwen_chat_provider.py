@@ -17,7 +17,7 @@ class TongyiChatObjectProvider(ChatObjectProvider):
         model = ALIASE_NAME_MODEL.get(name, name)
         if model in self.cache:
             return self.cache[model]
-        from .tongyi_chat_executor import TongyiChat
+        from .qwen_chat_executor import TongyiChat
 
         executor = TongyiChat(model=model, name=name,api_key=self.api_key)
         if executor.load():
