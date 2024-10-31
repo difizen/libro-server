@@ -90,6 +90,7 @@ class LibroChatStreamHandler(APIHandler):
                 if chat_key is None:
                     raise Exception("Invalid api key and default model!")
         prompt: str = data.get("prompt")
+        language: str = data.get("language")
         system_prompt: str = data.get("system_prompt")
         # 流式输出响应
         self.set_header('Content-Type', 'text/event-stream')
@@ -112,7 +113,7 @@ class LibroChatStreamHandler(APIHandler):
             final_result = ""
             try:
 
-                for chunk in executor.run(formattedPrompt,stream = True, sync = True,system_prompt = system_prompt):
+                for chunk in executor.run(formattedPrompt,stream = True, language = language,sync = True,system_prompt = system_prompt):
                     # Construct an event with data and event type
                     event_id = int(time.time())  # Simple event ID
                     event_type = "chunk"

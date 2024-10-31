@@ -24,7 +24,7 @@ class TongyiChat(LLMChat):
             return True
         return False
 
-    def run(self, value:StringPromptValue,stream=False, sync=True, system_prompt = None, **kwargs):
+    def run(self, value:StringPromptValue,language = None,stream=False, sync=True, system_prompt = None, **kwargs):
         if not self.chat:
             self.load()
         input = []
