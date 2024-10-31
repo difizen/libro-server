@@ -1,4 +1,4 @@
-from .tongyi_chat_provider import TongyiChatObjectProvider
+from .qwen_chat_provider import TongyiChatObjectProvider
 from .debug_provider import DebugChatObjectProvider
 from .executor import LLMChat, ChatExecutor
 from .openai_chat_provider import OpenAIChatObjectProvider
