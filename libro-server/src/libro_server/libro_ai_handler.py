@@ -5,8 +5,9 @@ from jupyter_server.auth.decorator import allow_unauthenticated
 from libro_ai.chat import chat_object_manager
 from jupyter_server.auth.decorator import allow_unauthenticated
 from tornado.web import HTTPError, authenticated
-from langchain.prompts import PromptTemplate
+from langchain_core.prompt_values import StringPromptValue
 from libro_core.config import libro_config
+import urllib.parse
 
 import tornado
 from tornado.web import HTTPError
@@ -41,13 +42,12 @@ class LibroChatHandler(APIHandler):
             or (prompt is None or prompt == "")
         ):
             raise Exception("Invalid prompt parameters!")
-
+        prompt = urllib.parse.unquote(prompt)
         dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
             object = dict.get(chat_key)
             if object:
-                template = PromptTemplate.from_template(prompt)
-                formattedPrompt = template.invoke({})
+                formattedPrompt = StringPromptValue(text=prompt)
                 executor = object.to_executor()
                 # Use langchain prompt to support prompt templates and other features
                 res = executor.run(formattedPrompt,sync = True
@@ -101,14 +101,13 @@ class LibroChatStreamHandler(APIHandler):
             or (prompt is None or prompt == "")
         ):
             raise Exception("Invalid prompt parameters!")
-
+        prompt = urllib.parse.unquote(prompt)
         dict = chat_object_manager.get_object_dict()
         if chat_key in dict:
             object = dict.get(chat_key)
             if object:
                 executor = object.to_executor()
-            template = PromptTemplate.from_template(prompt)
-            formattedPrompt = template.invoke({})
+            formattedPrompt = StringPromptValue(text=prompt)
             # 生成流式响应
             final_result = ""
             try:
