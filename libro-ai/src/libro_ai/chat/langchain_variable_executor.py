@@ -13,7 +13,7 @@ class LangChainVariableChat(ChatExecutor):
         super().__init__(name=variable["name"])
         self.variable = variable
 
-    def run(self, value:StringPromptValue,system_prompt, **kwargs):
+    def run(self, value:StringPromptValue,language = None,system_prompt = None, **kwargs):
         from IPython import get_ipython
         input = []
         if system_prompt is None:
