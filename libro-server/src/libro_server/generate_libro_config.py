@@ -17,7 +17,9 @@ def generate_libro_config():
     # 定义完全注释掉的 YAML 文件内容
     config_content = """
 # llm:
+#   DASHSCOPE_API_KEY: xxxxxxx
 #   OPENAI_API_KEY: xxxxxxxx
+#   default_model: qwen-max
 
 # db:
 #   - db_type: mysql
