@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Optional, Union
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain.callbacks import get_openai_callback
@@ -19,7 +19,7 @@ class DebugChat(LLMChat):
     model: str = Field(default="gpt-4o")
     system_message: SystemMessage = SystemMessage(content="You are a code debugging assistant. When errors are encountered during notebook execution, you output some error messages. Please attempt to explain the error and provide a solution. Each conversation will include code and error messages. Please respond in the language type used in the input.")
     chat: Union[ChatOpenAI, ChatTongyi] = None
-    api_key: str = None
+    api_key: Optional[str] = None
     model_type: List[str] = ['openai']
 
     def load(self):

@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import Field
 
 from .executor import LLMChat
@@ -15,7 +16,7 @@ class OpenAIChat(LLMChat):
     name: str = "chatgpt"
     model: str = Field(default="gpt-3.5-turbo")
     chat: ChatOpenAI = None
-    api_key: str = None
+    api_key: Optional[str] = None
 
     def load(self):
         if is_langchain_installed():
@@ -78,7 +79,7 @@ class DalleChat(LLMChat):
     name: str = "dalle-3"
     model: str = Field(default="dall-e-3")
     dalle: DallEAPIWrapper = None
-    api_key:str = None
+    api_key: Optional[str] = None
 
     def load(self):
         extra_params = {}
