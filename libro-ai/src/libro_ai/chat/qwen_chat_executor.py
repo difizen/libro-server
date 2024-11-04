@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import Field
 
 from .executor import LLMChat
@@ -13,7 +14,7 @@ class TongyiChat(LLMChat):
     name: str = "tongyi"
     model: str = Field(default="qwen-max")
     chat: ChatTongyi = None
-    api_key: str = None
+    api_key: Optional[str] = None
 
     def load(self):
         if is_langchain_installed():
