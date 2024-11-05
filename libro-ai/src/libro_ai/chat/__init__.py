@@ -1,4 +1,5 @@
 from .qwen_chat_provider import TongyiChatObjectProvider
+from .interpreter_provider import InterpreterChatObjectProvider
 from .debug_provider import DebugChatObjectProvider
 from .executor import LLMChat, ChatExecutor
 from .openai_chat_provider import OpenAIChatObjectProvider
@@ -24,6 +25,7 @@ if libro_ai_config is not None:
         type_of_model.append('openai')
 chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
 chat_object_manager.register_provider(DebugChatObjectProvider(type_of_model = type_of_model,api_key = api_key))
+chat_object_manager.register_provider(InterpreterChatObjectProvider())
 
 chat_record_provider = ChatRecordProvider()
 
