@@ -4,14 +4,14 @@ from pydantic import Field
 from .executor import LLMChat
 from ..utils import is_langchain_installed
 from langchain_community.chat_models.tongyi import ChatTongyi
-from langchain_core.messages import HumanMessage, SystemMessage,AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompt_values import StringPromptValue
 from IPython.display import display
 from libro_core.config import libro_config
 
 
-class TongyiChat(LLMChat):
-    name: str = "tongyi"
+class QwenChat(LLMChat):
+    name: str = "qwen"
     model: str = Field(default="qwen-max")
     chat: ChatTongyi = None
     api_key: Optional[str] = None
@@ -47,11 +47,11 @@ class TongyiChat(LLMChat):
                     raise Exception("Chat model not loaded")
                 chat = self.chat
                 if sync:
-                    result = chat.stream(input, streaming = True,**kwargs)
+                    result = chat.stream(input, streaming=True, **kwargs)
                     return result
                 else:
 
-                    result = chat.astream(input, streaming = True, **kwargs)
+                    result = chat.astream(input, streaming=True, **kwargs)
                     return result
             except Exception as e:
 
