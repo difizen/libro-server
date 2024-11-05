@@ -20,6 +20,10 @@ export default [
     component: 'libro',
   },
   {
+    path: '/dbgpt',
+    component: 'dbgpt',
+  },
+  {
     path: '/libro',
     component: 'libro',
   },
