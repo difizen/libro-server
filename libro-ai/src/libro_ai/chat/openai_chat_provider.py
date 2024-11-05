@@ -20,7 +20,10 @@ class OpenAIChatObjectProvider(ChatObjectProvider):
             return self.cache[model]
         from .openai_chat_executor import OpenAIChat
 
-        executor = OpenAIChat(model=model, name=name, api_key=self.api_key)
+        if self.api_key is not None:
+            executor = OpenAIChat(model=model, name=name, api_key=self.api_key)
+        else:
+            executor = OpenAIChat(model=model, name=name)
         if executor.load():
             self.cache[model] = executor
         return executor
@@ -31,7 +34,7 @@ class OpenAIChatObjectProvider(ChatObjectProvider):
             return self.cache[model]
         from .openai_chat_executor import DalleChat
 
-        executor = DalleChat(model=model, name=name,api_key=self.api_key)
+        executor = DalleChat(model=model, name=name, api_key=self.api_key)
         if executor.load():
             self.cache[model] = executor
         return executor

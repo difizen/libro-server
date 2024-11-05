@@ -4,7 +4,7 @@ from pydantic import Field
 from .executor import LLMChat
 from ..utils import is_langchain_installed
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage,AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompt_values import StringPromptValue
 from langchain.callbacks import get_openai_callback
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
@@ -70,6 +70,7 @@ class OpenAIChat(LLMChat):
                         result = chat.ainvoke(input, **kwargs)
                         return result
             except Exception as e:
+                print(e)
                 return ""
 
     def display(self, value, **kwargs):
