@@ -88,8 +88,8 @@ export const LibroExecutionComponent = forwardRef<HTMLDivElement>((props, ref) =
     <div className="libro-execution-container" ref={ref}>
       <div className="libro-execution-container-header">
         <Radio.Group value={instance.mode} onChange={handleSizeChange}>
-          <Radio.Button value="app">应用预览</Radio.Button>
-          <Radio.Button value="notebook">notebook</Radio.Button>
+          <Radio.Button value="app">App</Radio.Button>
+          <Radio.Button value="notebook">Notebook</Radio.Button>
         </Radio.Group>
       </div>
       <div className="libro-execution-container-content">{children}</div>
