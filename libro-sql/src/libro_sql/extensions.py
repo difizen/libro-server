@@ -13,10 +13,4 @@ def unload_ipython_extension(ipython: InteractiveShell):
 
 
 def _load_jupyter_server_extension(ipython):
-    """Load the Jupyter server extension.
-    Parameters
-    ----------
-    ipython: :class:`jupyter_client.ioloop.IOLoopKernelManager`
-        Jupyter kernel manager instance.
-    """
-    load_ipython_extension(ipython)
+    pass

@@ -1,6 +1,7 @@
 import os
 import yaml
 
+
 def generate_libro_config():
     # 定义生成的配置文件路径
     config_dir = os.path.expanduser("~/.libro")
@@ -9,7 +10,7 @@ def generate_libro_config():
     # 如果目录不存在，创建目录
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
-    
+
     if os.path.exists(config_file):
         print("Libro config file has already existed")
         return
@@ -36,7 +37,7 @@ def generate_libro_config():
 #     port: 5432
 #     database: libro
 
-# jpserver_extensions:
+# ipython_extensions:
 #   libro_ai: True
 #   libro_sql: True
 """
@@ -48,6 +49,7 @@ def generate_libro_config():
     print(f"Config file generated at {config_file}")
 
 # 用于注册 `libro config generate` 命令的入口函数
+
+
 def launch_generate_libro_config():
     generate_libro_config()
-

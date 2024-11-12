@@ -2,12 +2,14 @@ import logging
 from jupyter_server.services.kernels.kernelmanager import ServerKernelManager
 from libro_core.config import libro_config
 logger = logging.getLogger(__name__)
+
+
 class LibroKernelManager(ServerKernelManager):
 
-    async def start_kernel(self,**kw):
-        kernel_id = await super(LibroKernelManager,self).start_kernel(**kw)
+    async def start_kernel(self, **kw):
+        kernel_id = await super(LibroKernelManager, self).start_kernel(**kw)
         # 在内核启动时执行特定代码
-        extensions = libro_config.get_config().get("jpserver_extensions",{})
+        extensions = libro_config.get_config().get("ipython_extensions", {})
         commands = []
 
         # 遍历扩展，生成相应的 %load_ext 或 %unload_ext 命令
@@ -33,9 +35,9 @@ class LibroKernelManager(ServerKernelManager):
         return kernel_id
 
     async def restart_kernel(self, *args, **kwargs):
-        await super(LibroKernelManager,self).restart_kernel(*args, **kwargs)
+        await super(LibroKernelManager, self).restart_kernel(*args, **kwargs)
         # 在内核启动时执行特定代码
-        extensions = libro_config.get_config().get("jpserver_extensions",{})
+        extensions = libro_config.get_config().get("ipython_extensions", {})
         commands = []
 
         # 遍历扩展，生成相应的 %load_ext 或 %unload_ext 命令
