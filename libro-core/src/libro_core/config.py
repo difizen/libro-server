@@ -99,5 +99,8 @@ class LibroConfig():
         else:
             self.load_config(project_root_path, **kwargs)
             return self.config
+        
+    def set_config(self, new_config):
+        self.config = merge_dicts(self.config,new_config)
 
 libro_config = LibroConfig()
