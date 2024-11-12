@@ -1,6 +1,6 @@
 import {
   FileCommandContribution,
-  LibroFileService,
+  JupyterFileService,
   LibroJupyterConfiguration,
   PageConfig,
   ServerConnection,
@@ -27,7 +27,7 @@ export class LibroApp implements ApplicationContribution {
   @inject(FileCommandContribution) fileCommandContribution: FileCommandContribution;
   @inject(Fetcher) fetcher: Fetcher;
   @inject(OpenerService) openerService: OpenerService;
-  @inject(LibroFileService) libroFileService: LibroFileService;
+  @inject(JupyterFileService) jupyterFileService: JupyterFileService;
   location: string
 
   async onStart() {
@@ -65,13 +65,16 @@ export class LibroApp implements ApplicationContribution {
         this.layoutService.serverSatus = 'success';
         await this.initialWorkspace();
         if(this.location){
-          const defaultOpenUri = new URI(this.location+'/__init__.py');
-
+          const locationUri = new URI(this.location)
+          const defaultOpenUri = new URI(this.location+'/flow_run.ipynb');
+          if (!(await this.jupyterFileService.resolve(defaultOpenUri)).isFile) {
+            await this.jupyterFileService.newFile('flow_run.ipynb',locationUri)
+          }
           this.openerService.getOpener(defaultOpenUri).then((opener) => {
             if (opener) {
               opener.open(defaultOpenUri, {
                 viewOptions: {
-                  name: '__init__.py',
+                  name: 'flow_run.ipynb',
                 },
               });
             }
