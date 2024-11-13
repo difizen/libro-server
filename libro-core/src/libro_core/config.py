@@ -103,4 +103,11 @@ class LibroConfig():
     def set_config(self, new_config):
         self.config = merge_dicts(self.config,new_config)
 
+    def save_config(self):
+        import yaml
+        config_dir = os.path.expanduser("~/.libro")
+        config_file = os.path.join(config_dir, "libro_config.yaml")
+        with open(config_file, 'w') as file:
+            yaml.dump(self.config, file, default_flow_style=False, allow_unicode=True)
+
 libro_config = LibroConfig()
