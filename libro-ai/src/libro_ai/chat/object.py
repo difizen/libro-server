@@ -1,10 +1,11 @@
-from typing import List
+from typing import List, Optional
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from typing import Callable
 
 from .source import CHAT_SOURCE
 from .executor import ChatExecutor
+
 
 class ChatObject(BaseModel):
     name: str = None
@@ -14,19 +15,20 @@ class ChatObject(BaseModel):
 
     @property
     def key(self):
-        return '%s:%s'%(self.type, self.name)
-    
+        return '%s:%s' % (self.type, self.name)
+
     def model_dump(self):
         '''Dump to dict'''
         return {
             **super().model_dump(exclude="to_executor"),
-            "key":self.key
+            "key": self.key
         }
+
 
 class ChatObjectProvider(BaseModel, ABC):
     name: str = "custom"
     is_system_provider: bool = False
-    api_key: str = None
+    api_key: Optional[str] = None
 
     @abstractmethod
     def list(self) -> List[ChatObject]:
