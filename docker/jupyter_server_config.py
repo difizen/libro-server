@@ -1779,3 +1779,31 @@ c.ServerApp.token = ""
 #         "display_name": "libro-analyzer",
 #     },
 # }
+
+
+c.LanguageServerManager.autodetect = False
+# c is a magic, lazy variable
+c.LanguageServerManager.language_servers = {
+    "ruff-lsp": {
+        # if installed as a binary
+        "argv": [
+            "ruff-lsp",
+        ],
+        "languages": ["python"],
+        "version": 2,
+        "mime_types": ["text/x-python"],
+        "display_name": "ruff-lsp",
+    },
+    "libro-analyzer": {
+        # if installed as a binary
+        "argv": [
+            "node",
+            "/usr/local/lib/node_modules/@difizen/libro-analyzer/index.js",
+            "--stdio",
+        ],
+        "languages": ["python"],
+        "version": 2,
+        "mime_types": ["text/x-python"],
+        "display_name": "libro-analyzer",
+    },
+}
