@@ -9,6 +9,7 @@ import { LibroAINativeModuleSetting } from '@difizen/libro-ai-native';
 import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
 import { LibroDbgptLayoutView } from './dbgbt-layout.js'
 import { LibroDbgptLabCurrentFileFooterView } from './dbgpt-current-file-footer-view.js'
+import { FetcherModule } from '@difizen/magent-core';
 
 LibroAINativeModuleSetting.loadable = false;
 LibroPromptCellModuleSetting.loadable = false;
@@ -41,6 +42,7 @@ const App = (): JSX.Element => {
         modules={[
           ManaAppPreset,
           LibroLabModule,
+          FetcherModule,
           BaseModule,
           LibroSchemaFormWidgetModule,
         ]}
