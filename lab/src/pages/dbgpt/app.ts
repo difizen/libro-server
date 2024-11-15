@@ -73,7 +73,7 @@ export class LibroApp implements ApplicationContribution {
     );
     window.addEventListener('message', (event) => {
       // 确保消息来自可信源
-      if (event.origin === 'http://localhost:3000') {
+      if (event.origin === `${window.location.protocol}//${window.location.hostname}:3000`) {
         console.log('Received message from parent:', event.data);
         if(event.data.startsWith("lang:")){
           l10n.changeLang(getLocaleFromLang(event.data) as L10nLang);
@@ -123,7 +123,7 @@ export class LibroApp implements ApplicationContribution {
     const flow_uid = queryParams['flow_uid'];
     const res = await this.fetcher.get<any>(`/api/v1/serve/awel/flow/notebook/file/path`, {
       flow_uid:flow_uid,
-    },{baseURL:'http://localhost:5670'});
+    },{baseURL:`${window.location.protocol}//${window.location.hostname}:5670`});
     if(res.status&& res.data?.data?.path){
       const view =
       await this.viewManager.getOrCreateView<FileTreeView>(FileTreeViewFactory);
