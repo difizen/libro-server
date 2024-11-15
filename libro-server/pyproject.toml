@@ -1,6 +1,6 @@
 [project]
 name = "libro-server"
-version = "0.1.8.dev4"
+version = "0.1.8"
 description = "libro server"
 authors = [
     { name = "zhanba", email = "c5e1856@gmail.com" },
@@ -14,7 +14,7 @@ dependencies = [
     "ipython>=7.34.0",
     "jupyter-lsp>=2.2.4",
     "ruff-lsp>=0.0.53",
-    "libro-core>=0.1.5",
+    "libro-core>=0.1.6",
     "packaging>=24.2",
 ]
 readme = "README.md"

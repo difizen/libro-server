@@ -1,13 +1,13 @@
 [project]
 name = "libro"
-version = "0.1.23"
+version = "0.1.24"
 description = "libro"
 authors = [
     { name = "brokun", email = "brokun0128@gmail.com" },
     { name = "sunshinesmilelk", email = "ximo.lk66@gmail.com" },
     { name = "zhanba", email = "c5e1856@gmail.com" },
 ]
-dependencies = ["libro-server>=0.1.7", "libro-sql>=0.1.9", "libro-ai>=0.1.10"]
+dependencies = ["libro-server>=0.1.8", "libro-sql>=0.1.10", "libro-ai>=0.1.11"]
 dev-dependencies = []
 readme = "README.md"
 requires-python = ">= 3.9"

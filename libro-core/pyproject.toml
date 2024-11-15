@@ -1,6 +1,6 @@
 [project]
 name = "libro-core"
-version = "0.1.5"
+version = "0.1.6"
 description = "libro core"
 authors = [
     { name = "sunshinesmilelk", email = "ximo.lk66@gmail.com" },
