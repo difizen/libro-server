@@ -6,15 +6,32 @@ import {
   ServerConnection,
   ServerManager,
 } from '@difizen/libro-jupyter';
-import { ConfigurationService, FileTreeView, FileTreeViewFactory, OpenerService, URI } from '@difizen/mana-app';
+import { ConfigurationService, FileTreeView, FileTreeViewFactory, OpenerService, ThemeService, URI } from '@difizen/mana-app';
 import { SlotViewManager } from '@difizen/mana-app';
 import { terminalDefaultSlot } from '@difizen/libro-terminal';
 import qs from 'query-string';
 import { ApplicationContribution, ViewManager } from '@difizen/mana-app';
 import { inject, singleton } from '@difizen/mana-app';
 import { Fetcher } from '@difizen/magent-core';
+import { l10n, L10nLang } from '@difizen/mana-l10n';
 import { LayoutService, LibroLabLayoutSlots } from '@difizen/libro-lab';
 const ShouldPreventStoreViewKey = 'mana-should-prevent-store-view';
+
+function getLocaleFromLang(lang: string): string {
+  const languageMap: { [key: string]: string } = {
+    zh: 'zh-CN',
+    en: 'en-US',
+  };
+  const storedLang = localStorage.getItem('__db_gpt_lng_key');
+  const deafultLang = storedLang=== 'zh' ? 'zh-CN' : 'en-US'
+  const matchedLang = lang.match(/^lang:(\w+)$/)?.[1];
+
+  if (matchedLang) {
+    return languageMap[matchedLang] || deafultLang;
+  }
+
+  return deafultLang;
+}
 
 @singleton({ contrib: ApplicationContribution })
 export class LibroApp implements ApplicationContribution {
@@ -28,6 +45,7 @@ export class LibroApp implements ApplicationContribution {
   @inject(Fetcher) fetcher: Fetcher;
   @inject(OpenerService) openerService: OpenerService;
   @inject(JupyterFileService) jupyterFileService: JupyterFileService;
+  @inject(ThemeService) themeService: ThemeService;
   location: string
 
   async onStart() {
@@ -53,6 +71,21 @@ export class LibroApp implements ApplicationContribution {
       terminalDefaultSlot,
       LibroLabLayoutSlots.contentBottom,
     );
+    window.addEventListener('message', (event) => {
+      // 确保消息来自可信源
+      if (event.origin === 'http://localhost:3000') {
+        console.log('Received message from parent:', event.data);
+        if(event.data.startsWith("lang:")){
+          l10n.changeLang(getLocaleFromLang(event.data) as L10nLang);
+          this.layoutService.refresh()
+        }
+        if(event.data.startsWith("theme:")){
+          const matchedTheme = event.data.match(/^theme:(\w+)$/)?.[1];
+          const defaultTheme = localStorage.getItem('__db_gpt_theme_key');
+          this.themeService.setCurrentTheme(matchedTheme||defaultTheme)
+        }
+      }
+    });
     this.serverConnection.updateSettings({
       baseUrl,
       wsUrl: baseUrl.replace(/^http(s)?/, 'ws$1'),
