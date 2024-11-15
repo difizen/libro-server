@@ -4,10 +4,14 @@ import { ManaAppPreset, ManaComponents, ManaModule, Syringe } from '@difizen/man
 import { LibroApp } from './app.js';
 import './index.less';
 import { LibroPromptScript } from './prompt-script.js';
-import { PromptScript } from '@difizen/libro-prompt-cell';
+import { PromptScript, LibroPromptCellModuleSetting } from '@difizen/libro-prompt-cell';
+import { LibroAINativeModuleSetting } from '@difizen/libro-ai-native';
 import { LibroSchemaFormWidgetModule } from './schema-form-widget/index.js';
 import { LibroDbgptLayoutView } from './dbgbt-layout.js'
 import { LibroDbgptLabCurrentFileFooterView } from './dbgpt-current-file-footer-view.js'
+
+LibroAINativeModuleSetting.loadable = false;
+LibroPromptCellModuleSetting.loadable = false;
 
 const BaseModule = ManaModule.create().register({
   token:LibroLabApp,

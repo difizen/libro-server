@@ -25,6 +25,7 @@
     "@difizen/libro-core": "latest",
     "@difizen/libro-jupyter": "latest",
     "@difizen/libro-lab": "latest",
+    "@difizen/libro-ai-native": "latest",
     "@difizen/libro-terminal": "latest",
     "@difizen/libro-prompt-cell": "latest",
     "@difizen/libro-widget": "latest",
