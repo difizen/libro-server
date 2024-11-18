@@ -13,7 +13,7 @@ class DebugChatObjectProvider(ChatObjectProvider):
     name: str = "debug"
     cache: Dict[str, ChatExecutor] = {}
     LLMs: List[str] = ["gpt-3.5-turbo", "gpt-4"]
-    model_type: List[str] = ['openai']
+    type_of_model: List[str] = ['openai']
     is_system_provider: bool = True
 
     def get_or_create_executor(self, name: str) -> ChatExecutor:
@@ -21,7 +21,7 @@ class DebugChatObjectProvider(ChatObjectProvider):
             return self.cache[name]
         from .debug_executor import DebugChat
 
-        executor = DebugChat(model=name, name=name, model_type = self.model_type, api_key=self.api_key)
+        executor = DebugChat(model=name, name=name, type_of_model = self.type_of_model, api_key=self.api_key)
         if executor.load():
             self.cache[name] = executor
         return executor  

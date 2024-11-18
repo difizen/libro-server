@@ -20,7 +20,7 @@ class DebugChat(LLMChat):
     system_message: SystemMessage = SystemMessage(content="You are a code debugging assistant. When errors are encountered during notebook execution, you output some error messages. Please attempt to explain the error and provide a solution. Each conversation will include code and error messages. Please respond in the language type used in the input.")
     chat: Union[ChatOpenAI, ChatTongyi] = None
     api_key: Optional[str] = None
-    model_type: List[str] = ['openai']
+    type_of_model: List[str] = ['openai']
 
     def load(self):
         if is_langchain_installed():

@@ -11,19 +11,19 @@ from libro_core.config import libro_config
 
 chat_object_manager = ChatObjectManager()
 libro_ai_config = libro_config.get_config().get("llm")
-model_type = []
+type_of_model = []
 api_key:str = None
 if libro_ai_config is not None:
     if tongyi_api_key := libro_ai_config.get("DASHSCOPE_API_KEY"):
         api_key = tongyi_api_key
         chat_object_manager.register_provider(TongyiChatObjectProvider(api_key = api_key))
-        model_type.append('tongyi')
+        type_of_model.append('tongyi')
     if openai_api_key := libro_ai_config.get("OPENAI_API_KEY"):
         api_key = openai_api_key
         chat_object_manager.register_provider(OpenAIChatObjectProvider(api_key = api_key))
-        model_type.append('openai')
+        type_of_model.append('openai')
 chat_object_manager.register_provider(LangChainVariableChatObjectProvider())
-chat_object_manager.register_provider(DebugChatObjectProvider(model_type = model_type,api_key = api_key))
+chat_object_manager.register_provider(DebugChatObjectProvider(type_of_model = type_of_model,api_key = api_key))
 
 chat_record_provider = ChatRecordProvider()
 
