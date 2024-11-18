@@ -73,7 +73,7 @@ export class LibroApp implements ApplicationContribution {
     );
     window.addEventListener('message', (event) => {
       // 确保消息来自可信源
-      if (event.origin === `${window.location.protocol}//${window.location.hostname}:3000`) {
+      if (event.origin === `${window.location.protocol}//${window.location.hostname}:5670`) {
         console.log('Received message from parent:', event.data);
         if(event.data.startsWith("lang:")){
           l10n.changeLang(getLocaleFromLang(event.data) as L10nLang);
