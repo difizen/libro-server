@@ -1,6 +1,6 @@
 [project]
 name = "libro-sql"
-version = "0.1.10"
+version = "0.1.11"
 description = "libro sql"
 authors = [
     { name = "brokun", email = "brokun0128@gmail.com" },
@@ -8,9 +8,9 @@ authors = [
 ]
 dependencies = [
     "ipython>=7.34.0",
-    "sqlalchemy>=2.0.34",
-    "pandas>=2.2.2",
-    "pydantic>=2.9.1",
+    "sqlalchemy>=2.0.25",
+    "pandas>=2.0.3",
+    "pydantic>=2.6.4",
     "psycopg2-binary>=2.9.9",
     "pymysql>=1.1.1",
     "libro-core>=0.1.6",
