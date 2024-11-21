@@ -27,15 +27,21 @@ class OpenAIChat(LLMChat):
             return True
         return False
 
-    def run(self, value:StringPromptValue,language = None,stream=False, sync=True, system_prompt = None, **kwargs):
+    def run(self, value, language = None, stream=False, sync=True, system_prompt = None, **kwargs):
         if not self.chat:
             self.load()
-        input = []
-        if system_prompt is None:
-            input = [HumanMessage(content=value.text)]
+        if isinstance(value, list):
+            input = (
+                [SystemMessage(content=system_prompt)] + value
+                if system_prompt is not None
+                else value
+            )
         else:
-            input = [SystemMessage(content=system_prompt),HumanMessage(content=value.text)]
-        
+            input = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=value.text),
+            ] if system_prompt is not None else [HumanMessage(content=value.text)]
+
         if stream:
             try:
                 if not self.chat:
