@@ -15,11 +15,19 @@ class LangChainVariableChat(ChatExecutor):
 
     def run(self, value:StringPromptValue,language = None,system_prompt = None, **kwargs):
         from IPython import get_ipython
-        input = []
-        if system_prompt is None:
-            input = [HumanMessage(content=value.text)]
+
+        if isinstance(value, list):
+            input = (
+                [SystemMessage(content=system_prompt)] + value
+                if system_prompt is not None
+                else value
+            )
         else:
-            input = [SystemMessage(content=system_prompt),HumanMessage(content=value.text)]
+            input = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=value.text),
+            ] if system_prompt is not None else [HumanMessage(content=value.text)]
+            
         ipython = get_ipython()
         v: Runnable = ipython.user_ns[self.name]
         return v.invoke(input, **kwargs)
