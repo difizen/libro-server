@@ -12,6 +12,8 @@ class ChatObject(BaseModel):
     type: str = CHAT_SOURCE["CUSTOM"]
     order: int = 0
     to_executor: Callable[[], ChatExecutor] = None
+    api_key: Optional[str] = None
+    interpreterEnabled: Optional[bool] = False
 
     @property
     def key(self):

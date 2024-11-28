@@ -21,7 +21,7 @@ class LibroKernelManager(ServerKernelManager):
         for ext, enabled in extensions.items():
             command = f"%load_ext {ext}" if enabled else f"%unload_ext {ext}"
             commands.append(command)
-
+            
         # 使用 join 方法将所有命令连接成一个字符串
         code = "\n".join(commands)
         self.log.debug("Init execution codes: %r", code)
