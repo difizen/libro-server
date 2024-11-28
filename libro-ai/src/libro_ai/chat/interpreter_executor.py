@@ -43,7 +43,7 @@ def ipython_executor(code: str) -> int:
     command = sanitize_input(code)
     try:
         data = {
-            "application/vnd.libro.prompt+json": '```python\n%s \n```' % (code)}
+            "application/vnd.libro.interpreter.code+text": code}
         display(data, raw=True)
         exec(command)
     except Exception as e:
@@ -77,7 +77,7 @@ class InterpreterChat(LLMChat):
             selected_tool = tools[tool_call["name"].lower()]
             selected_tool.invoke(tool_call["args"])
 
-    def run(self, value: StringPromptValue, stream=True, sync=True, system_prompt=None, **kwargs):
+    def run(self, value: StringPromptValue, stream=False, sync=True, system_prompt=None, **kwargs):
         if not self.chat:
             self.load()
         input = [SystemMessage(content="You are a very useful assistant. When a user's problem can be solved with code, you generate Python code and execute it. These codes will run in an IPython environment and be displayed in a notebook, so you can use code commonly used in notebooks to get the job done."),

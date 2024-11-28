@@ -25,5 +25,6 @@ class InterpreterChatObjectProvider(ChatObjectProvider):
                 name=self.name,
                 to_executor=lambda: self.get_or_create_executor(),
                 type=CHAT_SOURCE["LLM"],
+                interpreterEnabled= True
             )
         ]
