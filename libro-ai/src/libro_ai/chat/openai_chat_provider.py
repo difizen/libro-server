@@ -3,7 +3,7 @@ from typing import Dict, List
 from .source import CHAT_SOURCE
 
 from .executor import ChatExecutor
-from .object import ChatObject, ChatObjectProvider
+from .object import ChatObject, ChatObjectProvider, SupportInterpreter
 from ..utils import is_langchain_installed
 from .utils import ALIASE_NAME_MODEL, MODEL_NAME_ALIASES
 
@@ -49,6 +49,7 @@ class OpenAIChatObjectProvider(ChatObjectProvider):
                         name=MODEL_NAME_ALIASES.get(n, n),
                         to_executor=lambda: self.get_or_create_executor(n),
                         type=CHAT_SOURCE["LLM"],
+                        support_interpreter=SupportInterpreter.DYNAMIC
                     ),
                     self.LLMs,
                 )
@@ -59,6 +60,7 @@ class OpenAIChatObjectProvider(ChatObjectProvider):
                         name=MODEL_NAME_ALIASES.get(n, n),
                         to_executor=lambda: self.get_or_create_lmm_executor(n),
                         type=CHAT_SOURCE["LMM"],
+                        support_interpreter=SupportInterpreter.DISABLE
                     ),
                     self.LMMs,
                 )
