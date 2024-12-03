@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 from pydantic import BaseModel
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from ..utils import is_ipython
 
@@ -9,6 +9,7 @@ from ..utils import is_ipython
 class ChatExecutor(BaseModel, ABC):
     name: str = "custom"
     order: int = 0
+    interpreter_enabled: Optional[bool] = False
 
     @abstractmethod
     def run(
@@ -30,6 +31,8 @@ class ChatExecutor(BaseModel, ABC):
 
             display(data, raw=True)
 
+    def set_interpreter_support(self,support: bool):
+        self.interpreter_enabled = support
 
 class LLMChat(ChatExecutor):
     name: str = "custom"
