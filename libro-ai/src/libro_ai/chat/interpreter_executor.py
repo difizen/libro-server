@@ -1,3 +1,4 @@
+from libro_ai.chat.utils import executor_by_ipython
 from pydantic import ConfigDict, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
@@ -12,26 +13,6 @@ import re
 from .executor import LLMChat
 from ..utils import is_langchain_installed
 
-
-def sanitize_input(query: str) -> str:
-    """Sanitize input to the python REPL.
-
-    Remove whitespace, backtick & python (if llm mistakes python console as terminal)
-
-    Args:
-        query: The query to sanitize
-
-    Returns:
-        str: The sanitized query
-    """
-
-    # Removes `, whitespace & python from start
-    query = re.sub(r"^(\s|`)*(?i:python)?\s*", "", query)
-    # Removes whitespace & ` from end
-    query = re.sub(r"(\s|`)*$", "", query)
-    return query
-
-
 @tool
 def ipython_executor(code: str) -> int:
     """A Python code executor. Use this to execute python commands. Input should be a valid python command.
@@ -40,15 +21,7 @@ def ipython_executor(code: str) -> int:
         code: pytho code
     """
 
-    command = sanitize_input(code)
-    try:
-        data = {
-            "application/vnd.libro.interpreter.code+text": code}
-        display(data, raw=True)
-        exec(command)
-    except Exception as e:
-        print('Error ocurred while run python code: %s' % (command))
-
+    executor_by_ipython(code)
 
 class InterpreterChat(LLMChat):
     name: str = "interpreter"
@@ -72,12 +45,12 @@ class InterpreterChat(LLMChat):
         return False
 
     def invoke_tool(self, res):
-        tools = {"ipython_executor": ipython_executor, }
+        tools = {"ipython_executor": ipython_executor,}
         for tool_call in res.tool_calls:
             selected_tool = tools[tool_call["name"].lower()]
             selected_tool.invoke(tool_call["args"])
 
-    def run(self, value: StringPromptValue, stream=False, sync=True, system_prompt=None, **kwargs):
+    def run(self, value: StringPromptValue, stream=True, sync=True, system_prompt=None, **kwargs):
         if not self.chat:
             self.load()
         input = [SystemMessage(content="You are a very useful assistant. When a user's problem can be solved with code, you generate Python code and execute it. These codes will run in an IPython environment and be displayed in a notebook, so you can use code commonly used in notebooks to get the job done."),
