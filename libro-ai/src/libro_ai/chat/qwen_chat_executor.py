@@ -1,20 +1,32 @@
 from typing import Optional
-from pydantic import Field
+from libro_ai.chat.utils import executor_by_ipython
+from pydantic import Field, ConfigDict
 
 from .executor import LLMChat
 from ..utils import is_langchain_installed
 from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.prompt_values import StringPromptValue
-from IPython.display import display
-from libro_core.config import libro_config
+from IPython.display import display,clear_output
+from langchain_core.runnables import Runnable
+from langchain_core.tools import tool
 
+@tool
+def ipython_executor(code: str) -> int:
+    """A Python code executor. Use this to execute python commands. Input should be a valid python command.
+
+    Args:
+        code: pytho code
+    """
+    executor_by_ipython(code)
 
 class QwenChat(LLMChat):
     name: str = "qwen"
     model: str = Field(default="qwen-max")
     chat: ChatTongyi = None
     api_key: Optional[str] = None
+    llm_with_tool: Optional[Runnable] = None
+    interpreter_enabled: Optional[bool] = False
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def load(self):
         if is_langchain_installed():
@@ -22,10 +34,18 @@ class QwenChat(LLMChat):
             if self.api_key:
                 extra_params["api_key"] = self.api_key
             self.chat = ChatTongyi(model_name=self.model, **extra_params)
+            self.llm_with_tool = self.chat.bind_tools(
+                [ipython_executor])
             return True
         return False
 
-    def run(self, value, language = None,stream=False, sync=True, system_prompt = None, **kwargs):
+    def invoke_tool(self, res):
+        tools = {"ipython_executor": ipython_executor,}
+        for tool_call in res.tool_calls:
+            selected_tool = tools[tool_call["name"].lower()]
+            selected_tool.invoke(tool_call["args"])
+
+    def run(self, value, language = None,stream=True, sync=True, system_prompt = None, **kwargs):
         if not self.chat:
             self.load()
 
@@ -43,30 +63,41 @@ class QwenChat(LLMChat):
         
         if stream:
             try:
-                if not self.chat:
+                if not self.chat or not self.llm_with_tool:
                     raise Exception("Chat model not loaded")
-                chat = self.chat
+                chat = self.llm_with_tool if self.interpreter_enabled else self.chat
                 if sync:
-                    result = chat.stream(input, streaming=True, **kwargs)
-                    return result
+                    iter = chat.stream(input, streaming=True, **kwargs)
                 else:
-
-                    result = chat.astream(input, streaming=True, **kwargs)
-                    return result
+                    iter = chat.astream(input, streaming=True, **kwargs)
+                first = True
+                gathered = None
+                for chunk in iter:
+                    if first:
+                        gathered = chunk
+                        first = False
+                    else:
+                        gathered = gathered + chunk
+                    clear_output(wait=True)
+                    self.display(gathered.content)
+                if self.interpreter_enabled:
+                    self.invoke_tool(gathered)
+                return iter
             except Exception as e:
 
                 return ""
         else:
             try:
-                if not self.chat:
+                if not self.chat or not self.llm_with_tool:
                     raise Exception("Chat model not loaded")
-                chat = self.chat
+                chat = self.llm_with_tool if self.interpreter_enabled else self.chat
                 if sync:
                     result = chat.invoke(input, **kwargs)
-                    return result
                 else:
                     result = chat.ainvoke(input, **kwargs)
-                    return result
+                if self.interpreter_enabled:
+                    self.invoke_tool(result)
+                return result
             except Exception as e:
                 return ""
 
