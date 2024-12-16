@@ -31,6 +31,7 @@
     "@difizen/libro-widget": "latest",
     "@difizen/magent-core": "^0.1.27",
     "@difizen/mana-app": "^0.1.25",
+    "@difizen/mana-l10n": "^0.1.25",
     "@difizen/mana-react": "^0.1.27",
     "@rjsf/antd": "^5.18.2",
     "@rjsf/core": "^5.18.2",
