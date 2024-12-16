@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from .source import CHAT_SOURCE
-from .object import ChatObject, ChatObjectProvider
+from .object import ChatObject, ChatObjectProvider, SupportInterpreter
 from .executor import ChatExecutor
 from ..utils.langchain import get_langchain_variable_dict_list, is_langchain_installed
 
@@ -28,6 +28,7 @@ class LangChainVariableChatObjectProvider(ChatObjectProvider):
                 name=v["name"],
                 to_executor=lambda: self.get_or_create_executor(v),
                 type=CHAT_SOURCE["VARIABLE"],
+                support_interpreter=SupportInterpreter.DISABLE
             ),
             variables,
         )

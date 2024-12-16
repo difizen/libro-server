@@ -94,40 +94,35 @@ class PromptMagic(Magics):
 
         record_id: str = args.get("record")
         variable_name: str = args.get("variable_name")
-        dict = chat_object_manager.get_object_dict()
-        if chat_key in dict:
-            object = dict.get(chat_key)
-            if object:
-                executor = object.to_executor()
-                # Use langchain prompt to support prompt templates and other features
-                template = PromptTemplate.from_template(prompt)
-                formattedPrompt = template.invoke(local_ns)
+        executor = chat_object_manager.get_executor(chat_key)
+        # Use langchain prompt to support prompt templates and other features
+        template = PromptTemplate.from_template(prompt)
+        formattedPrompt = template.invoke(local_ns)
 
-                res = None
-                if cell_id and record_id:
-                    record = chat_record_provider.get_record(record_id)
-                    record.append_messages(
-                        cell_id, formattedPrompt.to_messages(), reset=True
-                    )
-                    res = executor.run(record.get_messages())
-                    if res and isinstance(res, BaseMessage):
-                        record.append_message(cell_id, res)
-                    if res and isinstance(res, str):
-                        record.append_message(cell_id, AIMessage(content=res))
-                else:
-                    res = executor.run(formattedPrompt)
-                executor.display(res)
-                # Set variable
-                try:
-                    if variable_name is None or variable_name == "":
-                        return
-                    if not variable_name.isidentifier():
-                        raise Exception(
-                            'Invalid variable name "{}".'.format(variable_name)
-                        )
-                    else:
-                        local_ns[variable_name] = res
-                except Exception as e:
-                    raise Exception("set variable error", e)
+        res = None
+        if cell_id and record_id:
+            record = chat_record_provider.get_record(record_id)
+            record.append_messages(
+                cell_id, formattedPrompt.to_messages(), reset=True
+            )
+            res = executor.run(record.get_messages())
+            if res and isinstance(res, BaseMessage):
+                record.append_message(cell_id, res)
+            if res and isinstance(res, str):
+                record.append_message(cell_id, AIMessage(content=res))
         else:
-            raise Exception("Chat executor for %s not found!" % chat_key)
+            res = executor.run(formattedPrompt)
+        if res is not None:
+            executor.display(res)
+        # Set variable
+        try:
+            if variable_name is None or variable_name == "":
+                return
+            if not variable_name.isidentifier():
+                raise Exception(
+                    'Invalid variable name "{}".'.format(variable_name)
+                )
+            else:
+                local_ns[variable_name] = res
+        except Exception as e:
+            raise Exception("set variable error", e)
